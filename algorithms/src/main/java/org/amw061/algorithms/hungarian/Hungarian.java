@@ -1,16 +1,18 @@
 package org.amw061.algorithms.hungarian;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Set;
 
 public class Hungarian {
 
-    public int[][] run(int[][] matrix) {
+    public HashMap<Integer, Integer> run(int[][] matrix) {
         // Find the minimum value of each row.
         // Subtract from respective rows.
         matrix = subtractMinInRows(matrix);
@@ -27,7 +29,7 @@ public class Hungarian {
             matrix = solution.matrix;
         }
 
-        return matrix;
+        return findFinalSolution(matrix);
     }
 
     int[][] subtractMinInRows(int[][] matrix) {
@@ -144,6 +146,70 @@ public class Hungarian {
         }
 
         return new IntermediateSolution(false, matrix);
+    }
+
+    HashMap<Integer, Integer> findFinalSolution(int[][] matrix) {
+        int dim = matrix.length;
+        HashMap<Integer, Integer> result = Maps.newHashMap();
+
+        // go through each row, select a 0 if it is the only 0 in row, strike out if there are other 0s in same column
+        for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+            int numberOfZerosInRow = 0;
+            int index = -1;
+
+            for (int colIndex = 0; colIndex < dim; colIndex++) {
+                if (matrix[rowIndex][colIndex] == 0) {
+                    numberOfZerosInRow++;
+                    index = colIndex;
+                }
+            }
+
+            if (numberOfZerosInRow == 1) {
+                result.put(rowIndex, index);
+                matrix[rowIndex][index] = Integer.MAX_VALUE;
+
+                for (int i = 0; i < dim; i++) {
+                    if (matrix[i][index] == 0) {
+                        matrix[i][index] = Integer.MIN_VALUE;
+                    }
+                }
+            }
+        }
+
+        // go through each column, select a 0 if it is the only 0 in column, strike out if there are other 0s in same row
+        for (int colIndex = 0; colIndex < dim; colIndex++) {
+            int numberOfZerosInColumn = 0;
+            int index = -1;
+
+            for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+                if (matrix[rowIndex][colIndex] == 0) {
+                    numberOfZerosInColumn++;
+                    index = rowIndex;
+                }
+            }
+
+            if (numberOfZerosInColumn == 1) {
+                result.put(index, colIndex);
+                matrix[index][colIndex] = Integer.MAX_VALUE;
+
+                for (int i = 0; i < dim; i++) {
+                    if (matrix[index][i] == 0) {
+                        matrix[index][i] = Integer.MIN_VALUE;
+                    }
+                }
+            }
+        }
+
+        for (int colIndex = 0; colIndex < dim; colIndex++) {
+            for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+                if (matrix[rowIndex][colIndex] == 0) {
+                    result.put(rowIndex, colIndex);
+                    matrix[rowIndex][colIndex] = Integer.MAX_VALUE;
+                }
+            }
+        }
+
+        return result;
     }
 
     private int getIndexWithMaxValue(int[] zeros) {

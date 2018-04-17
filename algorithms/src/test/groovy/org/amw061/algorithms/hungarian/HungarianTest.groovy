@@ -73,6 +73,12 @@ class HungarianTest extends Specification {
                 [41, 0, 33, 11, 69],
                 [45, 31, 27, 18, 0]
         ] as int[][]
+
+        when:
+        def solution = algorithm.findFinalSolution(solution2.matrix)
+
+        then:
+        solution == [0:3, 1:2, 2:0, 3:1, 4:4]
     }
 
     // http://www.hungarianalgorithm.com/solve.php?c=23-77-65-0-38--61-20-34-0-44--0-0-0-40-33--51-28-84-1-0--73-71-82-0-5&random=1
@@ -161,10 +167,16 @@ class HungarianTest extends Specification {
                 [33, 10, 66, 6, 0],
                 [50, 48, 59, 0, 0]
         ] as int[][]
+
+        when:
+        def solution = algorithm.findFinalSolution(solution4.matrix)
+
+        then:
+        solution == [0:0, 1:1, 2:2, 3:4, 4:3]
     }
 
     @Unroll
-    def "run the algorithm on a huge dataset"() {
+    def "run the algorithm with dataset of #dim x #dim"() {
         given:
         def matrix = generateRandomMatrix(dim)
 
@@ -175,7 +187,7 @@ class HungarianTest extends Specification {
         result
 
         where:
-        dim << [1, 5, 10, 100, 1000, 10000]
+        dim << [1, 5, 10, 100, 1000, 2500]
     }
 
     def generateRandomMatrix(int dim) {
