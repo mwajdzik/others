@@ -5,13 +5,16 @@ import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Unroll
 
+// https://www.or-exchange.org/questions/1143/hungarian-method-logic-behind-minimum-lines
+// https://www.topcoder.com/community/data-science/data-science-tutorials/assignment-problem-and-hungarian-algorithm/
+
 class HungarianTest extends Specification {
 
     @Subject
     def algorithm = new Hungarian()
 
     @Shared
-    def r = new Random()
+    def r = new Random(3)
 
     // http://www.hungarianalgorithm.com/solve.php?c=16-17-51-36-70--79-29-22-57-66--10-36-20-63-9--42-1-34-32-69--93-79-75-86-47&random=1
     def "run the algorithm - dataset #1"() {

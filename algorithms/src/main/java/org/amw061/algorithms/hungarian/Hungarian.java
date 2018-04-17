@@ -5,30 +5,46 @@ import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
+import static java.nio.file.Files.newBufferedWriter;
+import static java.nio.file.Paths.get;
+
+@Slf4j
 public class Hungarian {
 
-    public HashMap<Integer, Integer> run(int[][] matrix) {
-        // Find the minimum value of each row.
-        // Subtract from respective rows.
+    public HashMap<Integer, Integer> run(int[][] matrix) throws IOException {
+        log.trace("Find the minimum value of each row. Subtract from respective rows.");
         matrix = subtractMinInRows(matrix);
 
-        // Find the minimum value of each column.
-        // Subtract from respective columns.
+        log.trace("Find the minimum value of each column. Subtract from respective columns.");
         matrix = subtractMinInColumns(matrix);
 
-        // Cover all zeros with a minimum number of lines
+        log.trace("Cover all zeros with a minimum number of lines.");
+        int iteration = 0;
         boolean solutionFound = false;
+
         while (!solutionFound) {
+            log.trace("Looking for the solution - iteration #{}", iteration++);
             IntermediateSolution solution = findIntermediateSolution(matrix);
             solutionFound = solution.solutionFound;
             matrix = solution.matrix;
+
+            if (iteration == 100) {
+                try (BufferedWriter writer = newBufferedWriter(get("invalid.txt"))) {
+                    writer.write(Arrays.deepToString(matrix));
+                    throw new RuntimeException("No solution found after " + iteration + " iterations");
+                }
+            }
         }
 
+        log.trace("Solution found!");
         return findFinalSolution(matrix);
     }
 
