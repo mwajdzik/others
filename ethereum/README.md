@@ -1,7 +1,7 @@
 
 ## Ethereum
 
-- a platform for creating applications 
+- a platform for creating decentrailized applications 
 - enables creation of DAC - Decentrailized Autonomous Corporations
 
 - Etherneum networks are used to transfer money and store data

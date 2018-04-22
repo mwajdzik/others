@@ -1,23 +1,25 @@
 package org.amw061.algorithms.hungarian;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
-import static java.nio.file.Files.newBufferedWriter;
-import static java.nio.file.Paths.get;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newHashSet;
 
+@SuppressWarnings("Duplicates")
 @Slf4j
 public class Hungarian {
+
+    public final static int CO = Integer.MIN_VALUE;
+    public final static int AS = Integer.MAX_VALUE;
 
     public HashMap<Integer, Integer> run(int[][] matrix) throws IOException {
         log.trace("Find the minimum value of each row. Subtract from respective rows.");
@@ -30,19 +32,19 @@ public class Hungarian {
         int iteration = 0;
         boolean solutionFound = false;
 
-        while (!solutionFound) {
-            log.trace("Looking for the solution - iteration #{}", iteration++);
-            IntermediateSolution solution = findIntermediateSolution(matrix);
-            solutionFound = solution.solutionFound;
-            matrix = solution.matrix;
-
-            if (iteration == 100) {
-                try (BufferedWriter writer = newBufferedWriter(get("invalid.txt"))) {
-                    writer.write(Arrays.deepToString(matrix));
-                    throw new RuntimeException("No solution found after " + iteration + " iterations");
-                }
-            }
-        }
+//        while (!solutionFound) {
+//            log.trace("Looking for the solution - iteration #{}", iteration++);
+//            IntermediateSolution solution = zeroAssignment(matrix);
+//            solutionFound = solution.solutionFound;
+//            matrix = solution.matrix;
+//
+//            if (iteration == 100) {
+//                try (BufferedWriter writer = newBufferedWriter(get("invalid.txt"))) {
+//                    writer.write(Arrays.deepToString(matrix));
+//                    throw new RuntimeException("No solution found after " + iteration + " iterations");
+//                }
+//            }
+//        }
 
         log.trace("Solution found!");
         return findFinalSolution(matrix);
@@ -79,7 +81,180 @@ public class Hungarian {
         return matrix;
     }
 
-    IntermediateSolution findIntermediateSolution(int[][] matrix) {
+    IntermediateSolution zeroAssignment(int[][] matrix) {
+        int dim = matrix.length;
+        Map<Integer, Integer> assignments = newHashMap();
+
+        log.trace("Go through each row, select a 0 if it is the only 0 in row, strike out if there are other 0s in same column.");
+        for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+            int numberOfZerosInRow = 0;
+            int foundIndex = -1;
+
+            for (int colIndex = 0; colIndex < dim; colIndex++) {
+                if (matrix[rowIndex][colIndex] == 0) {
+                    numberOfZerosInRow++;
+                    foundIndex = colIndex;
+                }
+            }
+
+            if (numberOfZerosInRow == 1) {
+                assignments.put(rowIndex, foundIndex);
+                matrix[rowIndex][foundIndex] = AS;
+
+                for (int i = 0; i < dim; i++) {
+                    if (matrix[i][foundIndex] == 0) {
+                        matrix[i][foundIndex] = CO;
+                    }
+                }
+            }
+        }
+
+        log.trace("Go through each column, select a 0 if it is the only 0 in column, strike out if there are other 0s in same row.");
+        for (int colIndex = 0; colIndex < dim; colIndex++) {
+            int numberOfZerosInColumn = 0;
+            int foundIndex = -1;
+
+            for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+                if (matrix[rowIndex][colIndex] == 0) {
+                    numberOfZerosInColumn++;
+                    foundIndex = rowIndex;
+                }
+            }
+
+            if (numberOfZerosInColumn == 1) {
+                assignments.put(foundIndex, colIndex);
+                matrix[foundIndex][colIndex] = AS;
+
+                for (int i = 0; i < dim; i++) {
+                    if (matrix[foundIndex][i] == 0) {
+                        matrix[foundIndex][i] = CO;
+                    }
+                }
+            }
+        }
+
+        log.trace("Mark the rest with AS.");
+        for (int colIndex = 0; colIndex < dim; colIndex++) {
+            for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+                if (matrix[rowIndex][colIndex] == 0) {
+                    assignments.put(rowIndex, colIndex);
+                    matrix[rowIndex][colIndex] = AS;
+                }
+            }
+        }
+
+        log.trace("At this point no 0 in the matrix, only AS or CO");
+
+        boolean solutionFound = assignments.size() == dim;
+        return new IntermediateSolution(solutionFound, matrix, assignments);
+    }
+
+    IntermediateSolution drawLines(int[][] matrix) {
+        int dim = matrix.length;
+
+        Set<Integer> markedRows = newHashSet();
+        Set<Integer> markedColumns = newHashSet();
+
+        Set<Integer> newlyMarkedRows = newHashSet();
+        Set<Integer> newlyMarkedColumns = newHashSet();
+
+        // Mark all rows having no assignments.
+        for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+            boolean noAssignment = true;
+
+            for (int colIndex = 0; colIndex < dim; colIndex++) {
+                if (matrix[rowIndex][colIndex] == AS) {
+                    noAssignment = false;
+                }
+            }
+
+            if (noAssignment) {
+                markedRows.add(rowIndex);
+                newlyMarkedRows.add(rowIndex);
+            }
+        }
+
+        // Mark all (unmarked) columns having zeros in newly marked row(s).
+        for (int colIndex = 0; colIndex < dim; colIndex++) {
+            for (int rowIndex : newlyMarkedRows) {
+                if (matrix[rowIndex][colIndex] == CO) {
+                    markedColumns.add(colIndex);
+                    newlyMarkedColumns.add(colIndex);
+                }
+            }
+        }
+
+        // Mark all rows having assignments in newly marked columns.
+        for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+            for (int colIndex : newlyMarkedColumns) {
+                if (matrix[rowIndex][colIndex] == AS) {
+                    markedRows.add(rowIndex);
+                }
+            }
+        }
+
+        newlyMarkedRows.clear();
+        newlyMarkedColumns.clear();
+
+        // ---
+
+        Set<Integer> columnLines = markedColumns;
+        Set<Integer> rowLines = newHashSet();
+
+        for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+            if (!markedRows.contains(rowIndex)) {
+                rowLines.add(rowIndex);
+            }
+        }
+
+        // ---
+
+        // result found
+        if (rowLines.size() + columnLines.size() == dim) {
+            return new IntermediateSolution(true, matrix, null);
+        }
+
+        // find the smallest uncovered number
+        int smallestUncoveredNumber = Integer.MAX_VALUE;
+        for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+            if (!rowLines.contains(rowIndex)) {
+                for (int colIndex = 0; colIndex < dim; colIndex++) {
+                    if (!columnLines.contains(colIndex)) {
+                        if (matrix[rowIndex][colIndex] < smallestUncoveredNumber) {
+                            smallestUncoveredNumber = matrix[rowIndex][colIndex];
+                        }
+                    }
+                }
+            }
+        }
+
+        // remove AS and CO marks
+        for (int colIndex = 0; colIndex < dim; colIndex++) {
+            for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+                if (matrix[rowIndex][colIndex] == AS || matrix[rowIndex][colIndex] == CO) {
+                    matrix[rowIndex][colIndex] = 0;
+                }
+            }
+        }
+
+        // subtract this number from all uncovered elements and
+        // add it to all elements that are covered twice
+        for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
+            for (int colIndex = 0; colIndex < dim; colIndex++) {
+                if (!rowLines.contains(rowIndex) && !columnLines.contains(colIndex)) {
+                    matrix[rowIndex][colIndex] -= smallestUncoveredNumber;
+                }
+
+                if (rowLines.contains(rowIndex) && columnLines.contains(colIndex)) {
+                    matrix[rowIndex][colIndex] += smallestUncoveredNumber;
+                }
+            }
+        }
+
+        return new IntermediateSolution(false, matrix, null);
+    }
+
+    IntermediateSolution findIntermediateSolutionGreedy(int[][] matrix) {
         int dim = matrix.length;
 
         int[] zerosInRows = new int[dim];
@@ -98,8 +273,8 @@ public class Hungarian {
             }
         }
 
-        Set<Integer> selectedRows = Sets.newHashSet();
-        Set<Integer> selectedColumns = Sets.newHashSet();
+        Set<Integer> selectedRows = newHashSet();
+        Set<Integer> selectedColumns = newHashSet();
 
         while (!(allZeros(zerosInRows) && allZeros(zerosInColumns))) {
             // find max of rows and columns
@@ -131,7 +306,7 @@ public class Hungarian {
 
         // result found
         if (selectedRows.size() + selectedColumns.size() == dim) {
-            return new IntermediateSolution(true, matrix);
+            return new IntermediateSolution(true, matrix, null);
         }
 
         // find the smallest uncovered number
@@ -161,12 +336,12 @@ public class Hungarian {
             }
         }
 
-        return new IntermediateSolution(false, matrix);
+        return new IntermediateSolution(false, matrix, null);
     }
 
     HashMap<Integer, Integer> findFinalSolution(int[][] matrix) {
         int dim = matrix.length;
-        HashMap<Integer, Integer> result = Maps.newHashMap();
+        HashMap<Integer, Integer> result = newHashMap();
 
         // go through each row, select a 0 if it is the only 0 in row, strike out if there are other 0s in same column
         for (int rowIndex = 0; rowIndex < dim; rowIndex++) {
@@ -255,5 +430,6 @@ public class Hungarian {
     private class IntermediateSolution {
         private boolean solutionFound;
         private int[][] matrix;
+        private Map<Integer, Integer> assignments;
     }
 }

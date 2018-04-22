@@ -1,4 +1,6 @@
 
+[https://www.youtube.com/watch?time_continue=3&v=ZGCHelJ5GWI]
+
 ** CloudFormation
 	- allows to create a whole system (a stack) based on a input JSON file (network topology, instances, ...)
 
