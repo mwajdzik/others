@@ -117,6 +117,23 @@
 - automates the process of adding or removing EC2 instances based on traffic demand for the application
 
 
+## Route 53
+- a place where we configure and manage web domains for websites or applications we host on AWS
+- allows to register a new domain, eg. example.com
+- DNS service
+- health checking - Route 53 sends automated requests over the Internet to the app to verify that it's reachable, available, and functional
+- create Record Sets - eg. www.example.com - DNS configuration
+- Route 53 automatically sends DNS record information to DNS servers AND it is also where it is decided where traffic request for that domain/IP address are routed
+
+
+## Lambda
+- lambda is serverless computing - it is the next generation of cloud computing that will replace EC2 instances (for the most part)
+- a compute service that lets run code without provisioning or managing servers
+- it executes the code only when needed and scales automatically
+- New function, Select blueprint (search for hello-world)
+- lambda can be triggered based on an event comming from SNS
+
+
 ## Examples
 - Netflix - EC2/RDS/S3
 - Dropbox - UI for S3
@@ -149,9 +166,12 @@
 - a private subsetion of AWS that we control, and in which we can place AWS resources (such as EC2 instances)
 - when we create an AWS account a "default" VPC is created
 
+
 ### Internet Gateway - IGW - provides a route to the outside world of the VPC
 
+
 ### Route Table - contains a set of rules (routes), that are used to determine where network trafic is directed
+
 
 ### NACL - Network Access Control Lists
 - an optional layer of security for a VPC that acts as a firewall for controlling trafic IN and OUT of one or more subnets
@@ -161,11 +181,9 @@
 - DENY all at the bottom
 - a subnet can be associated only with one NACL at a time
 
+
 ### Subnets - a subsection of a network
 - a VPC can contain one or more subnets in each Availability Zone
 - a subnet cannot span multiple zones
 - a public/private subnet - a public subnet has a route to the Internet, a private doesn't (a subnet is connected to a route table without IGW)
-
-
-
 
