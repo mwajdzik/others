@@ -1,0 +1,22 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t dornick/frontend -f Dockerfile.dev .
+
+script:
+  - docker run dornick/frontend npm run test -- --coverage
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-west-2"
+  app: "aws-elastic-beanstalk-app-name"
+  env: "aws-elastic-beanstalk-app-name-env"
+  bucket_name: "elasticbeanstack-us-west2-306476627567"
+  bucket_path: "aws-elastic-beanstalk-app-name"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: "$AWS_SECRET_KEY"
