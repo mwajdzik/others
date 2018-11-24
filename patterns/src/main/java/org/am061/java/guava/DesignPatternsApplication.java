@@ -1,13 +1,13 @@
 package org.am061.java.guava;
 
-import org.am061.java.guava.creational.Composite;
-import org.am061.java.guava.creational.FactoryMethod;
-import org.am061.java.guava.creational.Prototype;
+import org.am061.java.guava.creational.*;
 
 public class DesignPatternsApplication {
 
     public static void main(String[] args) {
         Pattern[] patterns = new Pattern[]{
+                new Builder(),
+                new AbstractFactory(),
                 new FactoryMethod(),
                 new Prototype(),
                 new Composite()
