@@ -10,8 +10,7 @@ import java.util.Map;
  * - dodaje produkty do sklepu,
  * - klonuje je do koszyków klientów,
  * - zmienia cenę u klienta (rabat).
- * <p>
- * <p>
+ *
  * Milk - 0.89 > 0.85
  * Bread - 1.10 > 0.99
  */

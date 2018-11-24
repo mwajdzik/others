@@ -9,24 +9,22 @@ import java.util.ArrayList;
  * Mamy 2 typy czytelników:
  * - normalnego (genericReader) - kupuje 1 książkę (encyklopedię),
  * - nałogowego (bookReader) - kupuje 3 kiążki (przygodowe, fantastykę oraz horror).
- * <p>
+ *
  * Proszę każdym z czytelników kupić odpowiednie książki i je wyświetlić.
- * <p>
  * Encyclopedia
- * <p>
+ *
  * AdventureBookReader
  * TreasureIsland
- * <p>
+ *
  * FantasyBookReader
  * LordOfTheRings
- * <p>
+ *
  * HorrorBookReader
  * Dracula
  */
 public class FactoryMethod implements Pattern {
 
     abstract class Book {
-
         abstract String getName();
     }
 
@@ -117,8 +115,7 @@ public class FactoryMethod implements Pattern {
 
     public void run() {
         BookReader genericReader = new GenericBookReader();
-        Book book = genericReader.buyBook();
-        System.out.println(book.getName());
+        System.out.println(genericReader.getBook());
 
         System.out.println("\n/* ********************************** */\n");
 
