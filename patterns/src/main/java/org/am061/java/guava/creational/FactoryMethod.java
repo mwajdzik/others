@@ -1,8 +1,29 @@
 package org.am061.java.guava.creational;
 
+import org.am061.java.guava.Pattern;
+
 import java.util.ArrayList;
 
-public class FactoryMethod {
+/**
+ * Proszę napisać program dzięki któremu czytelnicy mogą kupować książki.
+ * Mamy 2 typy czytelników:
+ * - normalnego (genericReader) - kupuje 1 książkę (encyklopedię),
+ * - nałogowego (bookReader) - kupuje 3 kiążki (przygodowe, fantastykę oraz horror).
+ * <p>
+ * Proszę każdym z czytelników kupić odpowiednie książki i je wyświetlić.
+ * <p>
+ * Encyclopedia
+ * <p>
+ * AdventureBookReader
+ * TreasureIsland
+ * <p>
+ * FantasyBookReader
+ * LordOfTheRings
+ * <p>
+ * HorrorBookReader
+ * Dracula
+ */
+public class FactoryMethod implements Pattern {
 
     abstract class Book {
 
@@ -94,7 +115,7 @@ public class FactoryMethod {
 
     // ---
 
-    public void main() {
+    public void run() {
         BookReader genericReader = new GenericBookReader();
         Book book = genericReader.buyBook();
         System.out.println(book.getName());

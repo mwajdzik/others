@@ -11,4 +11,12 @@
 
     <name>Patterns</name>
     <description>Patterns</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>LATEST</version>
+        </dependency>
+    </dependencies>
 </project>
