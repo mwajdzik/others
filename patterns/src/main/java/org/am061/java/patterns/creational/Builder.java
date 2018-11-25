@@ -1,7 +1,7 @@
-package org.am061.java.guava.creational;
+package org.am061.java.patterns.creational;
 
 import lombok.Getter;
-import org.am061.java.guava.Pattern;
+import org.am061.java.patterns.DesignPattern;
 
 /**
  * Proszę napisać (dokończyć) aplikację produkującą komputery wykorzystując wzorzec budowniczy.
@@ -32,7 +32,7 @@ import org.am061.java.guava.Pattern;
  * Harddisk: 320GB
  * Screen: 24 inch (1980 x 1200)
  */
-public class Builder implements Pattern {
+public class Builder implements DesignPattern {
 
     abstract class ComputerBuilder {
 

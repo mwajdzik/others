@@ -1,6 +1,6 @@
-package org.am061.java.guava.creational;
+package org.am061.java.patterns.creational;
 
-import org.am061.java.guava.Pattern;
+import org.am061.java.patterns.DesignPattern;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
  * Węzeł 3 zakończenie renderowania
  * Korzeń zakończenie renderowania
  */
-public class Composite implements Pattern {
+public class Composite implements DesignPattern {
 
     public interface Component {
         void render();

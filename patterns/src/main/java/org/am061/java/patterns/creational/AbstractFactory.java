@@ -1,6 +1,6 @@
-package org.am061.java.guava.creational;
+package org.am061.java.patterns.creational;
 
-import org.am061.java.guava.Pattern;
+import org.am061.java.patterns.DesignPattern;
 
 /**
  * Proszę napisać aplikację, która tworzyć będzie obiekty zawierające alfabet (fragment).
@@ -13,7 +13,7 @@ import org.am061.java.guava.Pattern;
  * αβγδε
  * абвгд
  */
-public class AbstractFactory implements Pattern {
+public class AbstractFactory implements DesignPattern {
 
     enum AlphabetType {LATIN, GREEK, RUSSIAN}
 

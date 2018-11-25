@@ -1,11 +1,11 @@
-package org.am061.java.guava;
+package org.am061.java.patterns;
 
-import org.am061.java.guava.creational.*;
+import org.am061.java.patterns.creational.*;
 
 public class DesignPatternsApplication {
 
     public static void main(String[] args) {
-        Pattern[] patterns = new Pattern[]{
+        DesignPattern[] patterns = new DesignPattern[]{
                 new Builder(),
                 new AbstractFactory(),
                 new FactoryMethod(),
@@ -15,7 +15,7 @@ public class DesignPatternsApplication {
 
         System.out.println("\n------------------------------------------\n");
 
-        for (Pattern pattern : patterns) {
+        for (DesignPattern pattern : patterns) {
             pattern.run();
             System.out.println("\n------------------------------------------\n");
         }

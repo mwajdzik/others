@@ -1,6 +1,6 @@
-package org.am061.java.guava.creational;
+package org.am061.java.patterns.creational;
 
-import org.am061.java.guava.Pattern;
+import org.am061.java.patterns.DesignPattern;
 
 import java.util.ArrayList;
 
@@ -22,7 +22,7 @@ import java.util.ArrayList;
  * HorrorBookReader
  * Dracula
  */
-public class FactoryMethod implements Pattern {
+public class FactoryMethod implements DesignPattern {
 
     abstract class Book {
         abstract String getName();
@@ -115,11 +115,11 @@ public class FactoryMethod implements Pattern {
 
     public void run() {
         BookReader genericReader = new GenericBookReader();
-        System.out.println(genericReader.getBook());
+        System.out.println(genericReader.getBook().getName());
 
         System.out.println("\n/* ********************************** */\n");
 
-        ArrayList<BookReader> bookReaderList = new ArrayList<BookReader>();
+        ArrayList<BookReader> bookReaderList = new ArrayList<>();
         bookReaderList.add(new AdventureBookReader());
         bookReaderList.add(new FantasyBookReader());
         bookReaderList.add(new HorrorBookReader());

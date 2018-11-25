@@ -1,6 +1,6 @@
-package org.am061.java.guava.creational;
+package org.am061.java.patterns.creational;
 
-import org.am061.java.guava.Pattern;
+import org.am061.java.patterns.DesignPattern;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
  * Milk - 0.89 > 0.85
  * Bread - 1.10 > 0.99
  */
-public class Prototype implements Pattern {
+public class Prototype implements DesignPattern {
 
     abstract class ProductPrototype {
 
