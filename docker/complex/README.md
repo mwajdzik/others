@@ -13,4 +13,7 @@ docker ps
 
 ---
 
-docker-compose up
+docker-compose up --build
+
+http://localhost:3050/
+
