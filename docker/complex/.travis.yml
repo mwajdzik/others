@@ -1,0 +1,37 @@
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t dornick/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run dornick/react-test npm run test -- --coverage
+
+after_success:
+  - docker build -t dornick/complex-client ./client
+  - docker build -t dornick/complex-nginx ./nginx
+  - docker build -t dornick/complex-server ./server
+  - docker build -t dornick/complex-worker ./worker
+
+  # log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+  # push images to docker hub
+  - docker push dornick/complex-client
+  - docker push dornick/complex-nginx
+  - docker push dornick/complex-server
+  - docker push dornick/complex-worker
+
+deploy:
+  provider: elasticbeanstalk
+  region: "us-west-2"
+  app: "aws-elastic-beanstalk-app-name"
+  env: "aws-elastic-beanstalk-app-name-env"
+  bucket_name: "elasticbeanstack-us-west2-306476627567"
+  bucket_path: "aws-elastic-beanstalk-app-name"
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key:
+    secure: "$AWS_SECRET_KEY"
