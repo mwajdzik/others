@@ -7,6 +7,7 @@ services:
     image: 'redis:latest'
 
   api:
+    image: dornick/complex-server
     build:
       context: ./server
       dockerfile: Dockerfile.dev
@@ -23,6 +24,7 @@ services:
       - PGPORT=5432
 
   client:
+    image: dornick/complex-client
     build:
       context: ./client
       dockerfile: Dockerfile.dev
@@ -31,6 +33,7 @@ services:
       - ./client:/app
 
   worker:
+    image: dornick/complex-worker
     build:
       context: ./worker
       dockerfile: Dockerfile.dev
@@ -42,6 +45,7 @@ services:
       - REDIS_PORT=6379
 
   proxy:
+    image: dornick/complex-nginx
     restart: always
     build:
       dockerfile: Dockerfile.dev
