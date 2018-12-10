@@ -18,6 +18,7 @@ app.get('/', (req, res) => {
         client.set('visits', parseInt(visits) + 1);
 
         if (visits % 5 === 0) {
+            console.log("Restarting...");
             process.exit(0);
         }
     });

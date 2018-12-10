@@ -4,6 +4,8 @@ services:
     image: 'redis'
   node-app:
     restart: always
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "4040:8081"
