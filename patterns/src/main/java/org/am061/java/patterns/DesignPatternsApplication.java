@@ -10,6 +10,8 @@ public class DesignPatternsApplication {
     public static void main(String[] args) {
         DesignPattern[] patterns = new DesignPattern[]{
                 new Builder(),
+                new Singleton(),
+                new BuilderWithDirector(),
                 new AbstractFactory(),
                 new FactoryMethod(),
                 new Prototype(),

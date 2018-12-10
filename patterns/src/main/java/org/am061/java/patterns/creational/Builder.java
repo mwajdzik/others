@@ -1,169 +1,128 @@
 package org.am061.java.patterns.creational;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.am061.java.patterns.DesignPattern;
 
-/**
- * Proszę napisać (dokończyć) aplikację produkującą komputery wykorzystując wzorzec budowniczy.
- * Aplikacja powinna potrafić złożyć 3 typy komputerów:
- * - stacjonarny,
- * - laptop,
- * - Apple.
- * <p>
- * Na końcu proszę utworzyć po jednej instancji każdego typu i je wyświetlić.
- * <p>
- * Computer: Laptop
- * Motherboard: DELL MotherBoard
- * Processor: Intel Core 2 Duo
- * Harddisk: 250GB
- * Screen: 15.4-inch (1280 x 800)
- * <p>
- * ------------
- * Computer: Desktop
- * Motherboard: Asus P6X58D Premium
- * Processor: Intel Xeon 7500
- * Harddisk: 2TB
- * Screen: 21 inch (1980 x 1200)
- * <p>
- * ------------
- * Computer: Apple
- * Motherboard: iMac G5 PowerPC
- * Processor: Intel Core 2 Duo
- * Harddisk: 320GB
- * Screen: 24 inch (1980 x 1200)
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/*
+    Helps to avoid complex constructors. Provides flexibility when creating objects.
  */
 public class Builder implements DesignPattern {
 
-    abstract class ComputerBuilder {
-
-        @Getter
-        protected Computer computer;
-
-        abstract void buildProcessor();
-
-        abstract void buildMotherboard();
-
-        abstract void buildHardDisk();
-
-        abstract void buildScreen();
+    @Getter
+    @Setter
+    @ToString
+    @AllArgsConstructor
+    private class Room {
+        private Dimension dimensions;
+        private Color wallColor;
+        private int floorNumber;
+        private int ceilingHeight;
+        private int numberOfDoors;
+        private int numberOfWindows;
     }
 
-    public enum ComputerTyp {
-        APPLE,
-        DESKTOP,
-        LAPTOP
+    @Getter
+    @Setter
+    @ToString
+    @AllArgsConstructor
+    private class House {
+        private List<Room> rooms;
     }
 
-    public class ComputerShop {
-        void constructComputer(ComputerBuilder computerBuilder) {
-            computerBuilder.buildMotherboard();
-            computerBuilder.buildProcessor();
-            computerBuilder.buildHardDisk();
-            computerBuilder.buildScreen();
-        }
-    }
+    private class RoomBuilder {
 
-    public class Computer {
+        private Dimension dimensions;
+        private int ceilingHeight;
+        private int floorNumber;
+        private Color wallColor;
+        private int numberOfWindows;
+        private int numberOfDoors;
 
-        private ComputerTyp computerType;
-        private String motherBoard;
-        private String processor;
-        private String hardDisk;
-        private String screen;
+        private RoomListBuilder roomListBuilder;
 
-        Computer(ComputerTyp computerTyp) {
-            computerType = computerTyp;
+        RoomBuilder(RoomListBuilder roomListBuilder) {
+            this.roomListBuilder = roomListBuilder;
         }
 
-        @Override
-        public String toString() {
-            return String.format("%s (%s, %s, %s, %s)",
-                    computerType, motherBoard, processor, hardDisk, screen);
-        }
-    }
-
-    public class DesktopBuilder extends ComputerBuilder {
-
-        DesktopBuilder() {
-            computer = new Computer(ComputerTyp.DESKTOP);
+        RoomBuilder setDimensions(Dimension dimensions) {
+            this.dimensions = dimensions;
+            return this;
         }
 
-        protected void buildHardDisk() {
-            computer.hardDisk = "2TB";
+        RoomBuilder setCeilingHeight(int ceilingHeight) {
+            this.ceilingHeight = ceilingHeight;
+            return this;
         }
 
-        protected void buildScreen() {
-            computer.screen = "21 inch (1980 x 1200)";
+        RoomBuilder setFloorNumber(int floorNumber) {
+            this.floorNumber = floorNumber;
+            return this;
         }
 
-        protected void buildProcessor() {
-            computer.processor = "Intel Xeon 7500";
+        RoomBuilder setWallColor(Color wallColor) {
+            this.wallColor = wallColor;
+            return this;
         }
 
-        protected void buildMotherboard() {
-            computer.motherBoard = "Asus P6X58D Premium";
-        }
-    }
-
-    public class LaptopBuilder extends ComputerBuilder {
-
-        LaptopBuilder() {
-            computer = new Computer(ComputerTyp.LAPTOP);
+        RoomBuilder setNumberOfWindows(int numberOfWindows) {
+            this.numberOfWindows = numberOfWindows;
+            return this;
         }
 
-        protected void buildHardDisk() {
-            computer.hardDisk = "250GB";
+        RoomBuilder setNumberOfDoors(int numberOfDoors) {
+            this.numberOfDoors = numberOfDoors;
+            return this;
         }
 
-        protected void buildScreen() {
-            computer.screen = "15.4-inch (1280 x 800)";
+        Room createRoom() {
+            return new Room(dimensions, wallColor, floorNumber, ceilingHeight, numberOfDoors, numberOfWindows);
         }
 
-        protected void buildProcessor() {
-            computer.processor = "Intel Core 2 Duo";
-        }
-
-        protected void buildMotherboard() {
-            computer.motherBoard = "DELL MotherBoard";
+        RoomListBuilder addRoomToList() {
+            Room room = createRoom();
+            this.roomListBuilder.addRoom(room);
+            return this.roomListBuilder;
         }
     }
 
-    public class AppleBuilder extends ComputerBuilder {
+    private class RoomListBuilder {
 
-        AppleBuilder() {
-            computer = new Computer(ComputerTyp.APPLE);
+        private List<Room> listOfRooms;
+
+        RoomListBuilder addList() {
+            this.listOfRooms = new ArrayList<>();
+            return this;
         }
 
-        protected void buildHardDisk() {
-            computer.hardDisk = "320GB";
+        RoomListBuilder addRoom(Room room) {
+            listOfRooms.add(room);
+            return this;
         }
 
-        protected void buildScreen() {
-            computer.screen = "24 inch (1980 x 1200)";
+        RoomBuilder addRoom() {
+            return new RoomBuilder(this);
         }
 
-        protected void buildProcessor() {
-            computer.processor = "Intel Core 2 Duo";
-        }
-
-        protected void buildMotherboard() {
-            computer.motherBoard = "iMac G5 PowerPC";
+        List<Room> buildList() {
+            return listOfRooms;
         }
     }
 
+    @Override
     public void run() {
-        ComputerShop computerShop = new ComputerShop();
+        List<Room> rooms = new RoomListBuilder().addList()
+                .addRoom().setFloorNumber(2).setWallColor(Color.BLUE).setDimensions(new Dimension(100, 200)).addRoomToList()
+                .addRoom().setFloorNumber(1).setCeilingHeight(250).setNumberOfWindows(2).setNumberOfDoors(1).addRoomToList()
+                .buildList();
 
-        ComputerBuilder laptopBuilder = new LaptopBuilder();
-        computerShop.constructComputer(laptopBuilder);
-        System.out.println(laptopBuilder.getComputer());
-
-        ComputerBuilder appleBuilder = new AppleBuilder();
-        computerShop.constructComputer(appleBuilder);
-        System.out.println(appleBuilder.getComputer());
-
-        ComputerBuilder desktopBuilder = new DesktopBuilder();
-        computerShop.constructComputer(desktopBuilder);
-        System.out.println(desktopBuilder.getComputer());
+        House house = new House(rooms);
+        System.out.println(house);
     }
 }
