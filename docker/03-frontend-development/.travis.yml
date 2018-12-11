@@ -1,4 +1,5 @@
 sudo: required
+
 services:
   - docker
 
@@ -8,13 +9,19 @@ before_install:
 script:
   - docker run dornick/frontend npm run test -- --coverage
 
+# AWS Elastic Beanstalk
+# All Applications  amw061-frontend-dev  Amw061FrontendDev-env  
+# Environment ID: e-yg7x3bj9uq, URL: Amw061FrontendDev-env.5a5ikhrunq.eu-central-1.elasticbeanstalk.com 
+
+# AWS_ACCESS_KEY and AWS_SECRET_KEY defined based on IAM User
+# values are set in Travis config
 deploy:
   provider: elasticbeanstalk
-  region: "us-west-2"
-  app: "aws-elastic-beanstalk-app-name"
-  env: "aws-elastic-beanstalk-app-name-env"
-  bucket_name: "elasticbeanstack-us-west2-306476627567"
-  bucket_path: "aws-elastic-beanstalk-app-name"
+  region: "eu-central-1"
+  app: "amw061-frontend-dev"
+  env: "Amw061FrontendDev-env"
+  bucket_name: "elasticbeanstalk-eu-central-1-943246088764"
+  bucket_path: "amw061-frontend-dev"
   on:
     branch: master
   access_key_id: $AWS_ACCESS_KEY
