@@ -22,7 +22,7 @@ public class DockerWebappApplicationTests {
 
     @Test
     public void shouldReturnPerson() throws Exception {
-        mvc.perform(get("/api/employees")
+        mvc.perform(get("/person")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Jakub")))
