@@ -24,3 +24,5 @@ subscription.on('message', (channel, message) => {
 });
 
 subscription.subscribe('insert');
+
+console.info("Worker started!");
