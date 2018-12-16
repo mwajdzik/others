@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: server-cluster-ip-servie
+  name: server-cluster-ip-service
 spec:
   type: ClusterIP
   ports:

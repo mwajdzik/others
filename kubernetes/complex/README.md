@@ -14,5 +14,14 @@ kubectl get pods -o wide
 kubectl get services -o wide
 kubectl get deployments -o wide
 
+kubectl get pvc -o wide
+kubectl get pv -o wide
+
 kubectl logs server-deployment-8789b9fd7-t6wrh
+
+# Secret (created with imperative command)
+
+kubectl create secret generic pgpassword --from-literal PGPASSWORD=password
+
+kubectl get secrets
 
