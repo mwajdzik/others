@@ -1,4 +1,4 @@
-appVersion: apps/v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: client-deployment
@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: client
-          image: dornick/complex-client:latest
+          image: dornick/complex-client:v1
           ports:
             - containerPort: 3000
