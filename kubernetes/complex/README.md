@@ -10,7 +10,9 @@ kubectl delete service client-node-port
 kubectl apply -f k8s
 
 # Inspect
-kubectl get pods
-kubectl get services
-kubectl get deployments
+kubectl get pods -o wide
+kubectl get services -o wide
+kubectl get deployments -o wide
+
+kubectl logs server-deployment-8789b9fd7-t6wrh
 
