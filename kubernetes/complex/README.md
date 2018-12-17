@@ -7,6 +7,11 @@ kubectl get services
 kubectl delete service client-node-port
 
 # Apply new configurations from k8s directory
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/mandatory.yaml
+
+minikube addons enable ingress
+
 kubectl apply -f k8s
 
 # Inspect
@@ -25,3 +30,6 @@ kubectl create secret generic pgpassword --from-literal PGPASSWORD=password
 
 kubectl get secrets
 
+# Dashboard
+
+minikube dashboard
