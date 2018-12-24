@@ -99,3 +99,9 @@ jd1.sum(1).expandDims(1).print();
 
 jd1.sum(1, true).concat(jd2, 1).print();
 jd1.sum(1).expandDims(1).concat(jd2, 1).print();
+
+console.log('-----------------------');
+
+const {mean, variance} = tf.moments(t21, 1);
+mean.print();
+variance.print();
