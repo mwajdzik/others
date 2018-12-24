@@ -59,3 +59,43 @@ t21.slice([0, 1], [6, 1]).print();
 t21.slice([0, 1], [-1, 1]).print();
 t21.slice([2, 2], [3, 1]).print();
 t21.slice([2, 2], [-1, 1]).print();
+
+// ---
+
+let t22 = tf.tensor([
+    [3, 2, 1],
+    [6, 5, 4],
+    [9, 8, 7],
+    [3, 2, 1],
+    [6, 5, 4],
+    [9, 8, 7]
+]);
+
+t21.concat(t22).print();
+t21.concat(t22, 0).print();
+t21.concat(t22, 1).print();
+
+// ---
+
+const jd1 = tf.tensor([
+    [70, 70, 70],
+    [70, 70, 70],
+    [70, 70, 70],
+    [70, 70, 70],
+]);
+
+const jd2 = tf.tensor([
+    [1, 160],
+    [2, 160],
+    [3, 160],
+    [4, 160],
+]);
+
+// sum all numbers in rows (1 - axis Y)
+jd1.sum(1).print();
+jd1.sum(1, true).print();
+jd1.sum(1).expandDims().print();
+jd1.sum(1).expandDims(1).print();
+
+jd1.sum(1, true).concat(jd2, 1).print();
+jd1.sum(1).expandDims(1).concat(jd2, 1).print();
