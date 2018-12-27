@@ -13,10 +13,22 @@ let { features, labels, testFeatures, testLabels } = csv('./cars.csv', {
 
 const lr = new LinearRegression(features, labels, {
     learningRate: 0.00001,
-    iterations: 10000
+    iterations: 100
 });
 
 lr.train();
 
 console.log('m=', lr.m);
 console.log('b=', lr.b);
+
+// ---
+
+const lrtf = new LinearRegression(features, labels, {
+    learningRate: 0.00001,
+    iterations: 100
+});
+
+lrtf.trainWithTensorFlow();
+
+console.log('m=', lrtf.weights.get(1, 0));
+console.log('b=', lrtf.weights.get(0, 0));
