@@ -19,36 +19,30 @@ const lr = new LinearRegressionManualCalc(features, labels, { learningRate: 0.00
 lr.train();
 
 console.log('--------------------------------------------------------------------------------------------------------');
-console.log('LinearRegressionManualCalc:');
+console.log('LinearRegressionManualCalc:\n');
 console.log('m=', lr.m, 'b=', lr.b);
-console.log('prediction(130)=', lr.m * 130 + lr.b);
+console.log('Prediction for', 130, 'is', lr.m * 130 + lr.b);
 console.log('');
 
 // --------------------------------------------------------------------------------------------------------
 
-const lrtf = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.01, iterations: 100 });
+const lrtf = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.0075, iterations: 100 });
 
 lrtf.train();
 
-const m = lrtf.weights.get(1, 0);
-const b = lrtf.weights.get(0, 0);
-const mean = lrtf.mean.get(0)
-const variance = lrtf.variance.get(0);
-const standardDeviation = variance ** 0.5
-
 console.log('--------------------------------------------------------------------------------------------------------');
-console.log('LinearRegressionTensorFlow:');
-console.log('m=', m, 'b=', b, 'mean=', mean, 'variance=', variance, 'standardDeviation=', standardDeviation);
-
-const x = 130;
-const stdX = (x - mean) / standardDeviation
-
-const newM = m / standardDeviation;
-const newB = b - (m * mean) / standardDeviation;
-
-console.log('Standardized', x, 'is', stdX);
-console.log('Prediction for', x, 'is', m * stdX + b);
-console.log('Prediction for', x, 'is', newM * x + newB);
+console.log('LinearRegressionTensorFlow:\n');
+console.log('weights (b, m1, m2, ...) =', lrtf.weights.toString());
+console.log('mean =', lrtf.mean.toString());
+console.log('variance =', lrtf.variance.toString());
+console.log('standardDeviation =', lrtf.variance.pow(0.5).toString());
 
 const cd = lrtf.test(testFeatures, testLabels);
 console.log('Coefficient of Determination:', cd);
+
+// ---
+
+const testData = [130, 1.752, 307];
+const stdTest = tf.ones([1]).concat(lrtf.standardize(tf.tensor(testData))).expandDims(0, 1);
+console.log('Prediction for', testData, 'is', stdTest.matMul(lrtf.weights).get(0, 0));
+console.log('');
