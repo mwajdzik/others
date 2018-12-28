@@ -87,10 +87,23 @@ class LinearRegression {
 
     processFeatures(features) {
         features = tf.tensor(features);
+
+        if (!(this.mean && this.variance)) {
+            const {mean, variance} = tf.moments(features, 0);
+            this.mean = mean;
+            this.variance = variance;
+        }
+        
+        features = this.standardize(features);
+
         const ones = tf.ones([features.shape[0], 1]);       // generate a matrix with one column of ones
         features = ones.concat(features, 1);                // concat ones with features
 
         return features;
+    }
+
+    standardize(features) {
+        return features.sub(this.mean).div(this.variance.pow(0.5));
     }
 }
 
