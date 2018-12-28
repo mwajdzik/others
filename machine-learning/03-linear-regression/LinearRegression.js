@@ -9,9 +9,7 @@ class LinearRegression {
         this.m = 0;
         this.b = 0;
 
-        this.featuresTensor = tf.tensor(features);
-        const ones = tf.ones([this.featuresTensor.shape[0], 1])     // generate a matrix with one column of ones
-        this.featuresTensor = ones.concat(this.featuresTensor, 1);  // concat ones with features
+        this.featuresTensor = this.processFeatures(features);
         this.labelsTensor = tf.tensor(labels);
         this.weights = tf.zeros([2, 1]);    // create a tensor (matrix) for weights (m, b)
 
@@ -66,6 +64,33 @@ class LinearRegression {
 
         this.weights = this.weights
             .sub(slopes.mul(this.options.learningRate))
+    }
+
+    test(testFeatures, testLabels) {
+        testFeatures = this.processFeatures(testFeatures);
+        testLabels = tf.tensor(testLabels);
+
+        const predictions = testFeatures.matMul(this.weights);
+        
+        const ssTot = testLabels.sub(testLabels.mean())
+            .pow(2)
+            .sum()
+            .get();
+        
+        const ssRes = testLabels.sub(predictions)
+            .pow(2)
+            .sum()
+            .get();
+
+        return 1 - ssRes / ssTot;
+    }
+
+    processFeatures(features) {
+        features = tf.tensor(features);
+        const ones = tf.ones([features.shape[0], 1]);       // generate a matrix with one column of ones
+        features = ones.concat(features, 1);                // concat ones with features
+
+        return features;
     }
 }
 

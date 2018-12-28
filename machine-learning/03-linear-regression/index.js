@@ -32,3 +32,6 @@ lrtf.trainWithTensorFlow();
 
 console.log('m=', lrtf.weights.get(1, 0));
 console.log('b=', lrtf.weights.get(0, 0));
+
+const cd = lrtf.test(testFeatures, testLabels);
+console.log('Coefficient of Determination:', cd);
