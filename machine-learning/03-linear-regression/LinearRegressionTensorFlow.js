@@ -7,6 +7,7 @@ class LinearRegressionTensorFlow {
         this.features = this.processFeatures(features);
         this.labels = tf.tensor(labels);
         this.weights = tf.zeros([this.features.shape[1], 1]);    // create a tensor (matrix) for weights (m, b)
+        this.mseHistory = [];
 
         this.options = Object.assign({
             learningRate: 0.1,
@@ -17,6 +18,8 @@ class LinearRegressionTensorFlow {
     train() {
         for (let i = 0; i < this.options.iterations; i++) {
             this.gradientDescent();
+            this.recordMeanSquaredError();
+            this.updateLearningRate();
         }
     }
 
@@ -35,7 +38,7 @@ class LinearRegressionTensorFlow {
             .mul(2);
 
         this.weights = this.weights
-            .sub(slopes.mul(this.options.learningRate))
+            .sub(slopes.mul(this.options.learningRate));
     }
 
     test(testFeatures, testLabels) {
@@ -76,6 +79,33 @@ class LinearRegressionTensorFlow {
 
     standardize(features) {
         return features.sub(this.mean).div(this.variance.pow(0.5));
+    }
+
+    recordMeanSquaredError() {
+        const mse = this.features.matMul(this.weights)
+            .sub(this.labels)
+            .pow(2)
+            .sum()
+            .div(this.features.shape[0])
+            .get();
+
+        this.mseHistory.push(mse);
+    }
+
+    updateLearningRate() {
+        if (this.mseHistory.length < 2) {
+            return;
+        }
+
+        const len = this.mseHistory.length;
+        const lastValue = this.mseHistory[len - 1];
+        const secondLastValue = this.mseHistory[len - 2];
+
+        if (lastValue > secondLastValue) {
+            this.options.learningRate /= 2;
+        } else {
+            this.options.learningRate *= 1.05;
+        }
     }
 }
 

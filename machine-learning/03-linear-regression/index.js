@@ -26,7 +26,7 @@ console.log('');
 
 // --------------------------------------------------------------------------------------------------------
 
-const lrtf = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.0075, iterations: 100 });
+const lrtf = new LinearRegressionTensorFlow(features, labels, { learningRate: 10, iterations: 100 });
 
 lrtf.train();
 
