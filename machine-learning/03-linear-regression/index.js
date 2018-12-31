@@ -1,11 +1,10 @@
 require('@tensorflow/tfjs-node');
-const tf = require('@tensorflow/tfjs');
 
-const csv = require('./load-csv');
+const loadCsv = require('./load-csv');
 const LinearRegressionManualCalc = require('./LinearRegressionManualCalc');
 const LinearRegressionTensorFlow = require('./LinearRegressionTensorFlow');
 
-let { features, labels, testFeatures, testLabels } = csv('./cars.csv', {
+let { features, labels, testFeatures, testLabels } = loadCsv('./cars.csv', {
     shuffle: true,
     splitTest: 50,
     dataColumns: ['horsepower', 'weight', 'displacement'],
