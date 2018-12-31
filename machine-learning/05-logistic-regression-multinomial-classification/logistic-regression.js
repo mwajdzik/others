@@ -6,7 +6,7 @@ class LogisticRegressionTensorFlow {
     constructor(features, labels, options) {
         this.features = this.processFeatures(features);
         this.labels = tf.tensor(labels);
-        this.weights = tf.zeros([this.features.shape[1], 1]);
+        this.weights = tf.zeros([this.numberOfCols(this.features), this.numberOfCols(this.labels)]);
         this.costHistory = [];
 
         this.options = Object.assign({
@@ -16,7 +16,7 @@ class LogisticRegressionTensorFlow {
             decisionBoundry: 0.5
         }, options);
 
-        this.currentLearningRate = this.options.learningRate;
+        this.currentLearningRate = this.options.learningRate;;
     }
 
     train() {
@@ -46,7 +46,7 @@ class LogisticRegressionTensorFlow {
     }
 
     gradientDescent(features, labels) {
-        const currentGuesses = features.matMul(this.weights).sigmoid();
+        const currentGuesses = features.matMul(this.weights).softmax();
         const differences = currentGuesses.sub(labels);
 
         const slopes = features
@@ -62,17 +62,18 @@ class LogisticRegressionTensorFlow {
     predict(observations) {
         return this.processFeatures(observations)
             .matMul(this.weights)
-            .sigmoid()
-            .greater(this.options.decisionBoundry)
-            .cast('float32');
+            .softmax()
+            // uncomment to see probability values
+            // .greater(this.options.decisionBoundry)
+            // .cast('float32')
+            .argMax(1);
     }
 
     test(testFeatures, testLabels) {
         const allRowsCount = testFeatures.length;
 
         const incorrect = this.predict(testFeatures)
-            .sub(tf.tensor(testLabels))
-            .abs()
+            .notEqual(tf.tensor(testLabels).argMax(1))
             .sum()
             .get();
         
@@ -101,7 +102,7 @@ class LogisticRegressionTensorFlow {
     }
 
     recordCrossEntropy() {
-        const guesses = this.features.matMul(this.weights).sigmoid();
+        const guesses = this.features.matMul(this.weights).softmax();
 
         const term1 = this.labels.transpose()
             .matMul(guesses.log());
@@ -135,6 +136,10 @@ class LogisticRegressionTensorFlow {
 
     numberOfRows(tensor) {
         return tensor.shape[0];
+    }
+
+    numberOfCols(tensor) {
+        return tensor.shape[1];
     }
 }
 
