@@ -1,9 +1,7 @@
-// node --inspect-brk  index.js
+require('@tensorflow/tfjs-node');               // tfjs-node-gpu
 
-require('@tensorflow/tfjs-node');
-// require('@tensorflow/tfjs-node-gpu');
 const tf = require('@tensorflow/tfjs');
-const loadCsv = require('./load-csv');
+const loadCsv = require('./data/load-csv');
 
 function knn(features, labels, predictionPoint, k) {
     const {mean, variance} = tf.moments(features, 0);
@@ -23,7 +21,7 @@ function knn(features, labels, predictionPoint, k) {
         .reduce((acc, a) => acc + a.get(1), 0) / k;
 }
 
-let { features, labels, testFeatures, testLabels } = loadCsv('kc_house_data.csv', {
+let { features, labels, testFeatures, testLabels } = loadCsv('./data/kc_house_data.csv', {
     shuffle: true,
     splitTest: 10,
     dataColumns: ['lat', 'long', 'sqft_lot', 'sqft_living'],

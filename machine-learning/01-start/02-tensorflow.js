@@ -4,7 +4,7 @@ console.log('-----------------------');
 let t1 = tf.tensor([1, 2, 3]);
 let t2 = tf.tensor([4, 5, 6]);
 
-t1.add(t2).print()
+t1.add(t2).print();
 t1.sub(t2).print();
 t1.mul(t2).print();
 t1.div(t2).print();
