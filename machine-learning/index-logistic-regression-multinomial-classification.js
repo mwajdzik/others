@@ -1,9 +1,10 @@
 require('@tensorflow/tfjs-node');
-const _ = require('lodash');
-const loadCsv = require('../03-linear-regression-gradient-descent/load-csv');
-const LogisticRegression = require('./logistic-regression');
 
-let { features, labels, testFeatures, testLabels } = loadCsv('../03-linear-regression-gradient-descent/cars.csv', {
+const _ = require('lodash');
+const loadCsv = require('./data/load-csv');
+const LogisticRegression = require('./logistic-regression-multinomial-classification/logistic-regression');
+
+let { features, labels, testFeatures, testLabels } = loadCsv('./data/cars.csv', {
     shuffle: true,
     splitTest: 50,
     dataColumns: ['horsepower', 'weight', 'displacement'],
@@ -13,15 +14,17 @@ let { features, labels, testFeatures, testLabels } = loadCsv('../03-linear-regre
             const mpg = parseFloat(value);
 
             if (mpg < 15) {
-                return [1, 0, 0];
+                return [1, 0, 0];           // HIGH fuel consumption
             } else if (mpg < 30) {
-                return [0, 1, 0];
+                return [0, 1, 0];           // MEDIUM fuel consumption
             } else {
-                return [0, 0, 1];
+                return [0, 0, 1];           // LOW fuel consumption
             }
         }
     }
 });
+
+// --------------------------------------------------------------------------------------------------------
 
 labels = _.flatMap(labels);
 

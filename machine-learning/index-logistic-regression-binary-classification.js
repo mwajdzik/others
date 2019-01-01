@@ -1,8 +1,9 @@
 require('@tensorflow/tfjs-node');
-const loadCsv = require('../03-linear-regression-gradient-descent/load-csv');
-const LogisticRegression = require('./logistic-regression');
 
-let { features, labels, testFeatures, testLabels } = loadCsv('../03-linear-regression-gradient-descent/cars.csv', {
+const loadCsv = require('./data/load-csv');
+const LogisticRegression = require('./logistic-regression-binary-classification/logistic-regression');
+
+let { features, labels, testFeatures, testLabels } = loadCsv('./data/cars.csv', {
     shuffle: true,
     splitTest: 50,
     dataColumns: ['horsepower', 'weight', 'displacement'],
@@ -13,6 +14,8 @@ let { features, labels, testFeatures, testLabels } = loadCsv('../03-linear-regre
         }
     }
 });
+
+// --------------------------------------------------------------------------------------------------------
 
 const lr = new LogisticRegression(features, labels, {
     learningRate: 0.1,

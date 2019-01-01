@@ -1,7 +1,8 @@
 require('@tensorflow/tfjs-node');
+
 const _ = require('lodash');
 const mnist = require('mnist-data');
-const LogisticRegression = require('../05-logistic-regression-multinomial-classification/logistic-regression');
+const LogisticRegression = require('./logistic-regression-multinomial-classification/logistic-regression');
 
 function loadData() {
     const mnistData = mnist.training(0, 60000);

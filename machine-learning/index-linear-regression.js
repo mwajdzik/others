@@ -1,14 +1,14 @@
 require('@tensorflow/tfjs-node');
 
-const loadCsv = require('./load-csv');
-const LinearRegressionManualCalc = require('./LinearRegressionManualCalc');
-const LinearRegressionTensorFlow = require('./LinearRegressionTensorFlow');
+const loadCsv = require('./data/load-csv');
+const LinearRegressionManualCalc = require('./linear-regression/linear-regression-manual-calc');
+const LinearRegressionTensorFlow = require('./linear-regression/linear-regression-tensor-flow.js');
 
-let { features, labels, testFeatures, testLabels } = loadCsv('./cars.csv', {
+let { features, labels, testFeatures, testLabels } = loadCsv('./data/cars.csv', {
     shuffle: true,
     splitTest: 50,
     dataColumns: ['horsepower', 'weight', 'displacement'],
-    labelColumns: ['mpg'],          // miles per galon
+    labelColumns: ['mpg']
 });
 
 // --------------------------------------------------------------------------------------------------------
@@ -18,9 +18,9 @@ console.log('-------------------------------------------------------------------
 const lr = new LinearRegressionManualCalc(features, labels, { learningRate: 0.00001, iterations: 100 });
 lr.train();
 
-console.log('LinearRegressionManualCalc:\n');
+console.log('LinearRegression - manual calculations:\n');
 console.log('m=', lr.m, 'b=', lr.b);
-console.log('Prediction for', 130, 'is', lr.m * 130 + lr.b);
+console.log('prediction for', 130, 'is', lr.m * 130 + lr.b);
 console.log('');
 
 // --------------------------------------------------------------------------------------------------------
@@ -28,13 +28,13 @@ console.log('');
 function printResults(lrtf) {
     console.log('--------------------------------------------------------------------------------------------------------');
 
-    console.log('LinearRegressionTensorFlow:\n');
+    console.log('LinearRegression - with TensorFlow:\n');
     console.log('options =', lrtf.options, '\n');
     console.log('weights (b, m1, m2, ...) =', lrtf.weights.toString());
     console.log('mean =', lrtf.mean.toString());
     console.log('variance =', lrtf.variance.toString());
     console.log('standardDeviation =', lrtf.variance.pow(0.5).toString());
-    console.log('Coefficient of Determination:', lrtf.test(testFeatures, testLabels));
+    console.log('coefficient of determination:', lrtf.test(testFeatures, testLabels));
 
     const testData = [
         [130, 1.752, 307],
@@ -43,24 +43,24 @@ function printResults(lrtf) {
     ]; 
 
     const predictions = lrtf.predict(testData);
-    console.log('Prediction for', testData, 'is', predictions.toString());
+    console.log('prediction for', testData, 'is', predictions.toString());
     console.log('');
 }
 
 console.time('Gradient Descent');
-const lrtfGradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 100 });
-lrtfGradientDescent.train();
-printResults(lrtfGradientDescent);
+const gradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 100 });
+gradientDescent.train();
+printResults(gradientDescent);
 console.timeEnd('Gradient Descent');
 
 console.time('Batch Gradient Descent');
-const lrtfBatchGradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 5, batchSize: 10 });
-lrtfBatchGradientDescent.trainUsingBatches();
-printResults(lrtfBatchGradientDescent);
+const batchGradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 5, batchSize: 10 });
+batchGradientDescent.trainUsingBatches();
+printResults(batchGradientDescent);
 console.timeEnd('Batch Gradient Descent');
 
 console.time('Stochastic Gradient Descent');
-const lrtfStochasticGradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 5, batchSize: 1 });
-lrtfStochasticGradientDescent.trainUsingBatches();
-printResults(lrtfStochasticGradientDescent);
+const stochasticGradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 5, batchSize: 1 });
+stochasticGradientDescent.trainUsingBatches();
+printResults(stochasticGradientDescent);
 console.timeEnd('Stochastic Gradient Descent');
