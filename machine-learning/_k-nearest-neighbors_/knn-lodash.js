@@ -1,3 +1,4 @@
+const _ = require('lodash');
 
 function runAnalysis(outputs) {
     const testSetSize = Math.floor(0.2 * outputs.length);
