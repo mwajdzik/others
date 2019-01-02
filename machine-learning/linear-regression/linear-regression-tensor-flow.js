@@ -24,7 +24,10 @@ class LinearRegressionTensorFlow {
 
     train() {
         for (let i = 0; i < this.options.iterations; i++) {
-            this.gradientDescent(this.features, this.labels);
+            this.weights = tf.tidy(() => {
+                return this.gradientDescent(this.features, this.labels);
+            });
+
             this.recordMeanSquaredError();
             this.updateLearningRate();
         }
@@ -38,9 +41,12 @@ class LinearRegressionTensorFlow {
         for (let i = 0; i < this.options.iterations; i++) {
             for (let j = 0; j < batchQuantity; j++) {
                 const startIndex = j * batchSize;
-                const featureSlice = this.features.slice([startIndex, 0], [batchSize, -1]);
-                const labelSlice = this.labels.slice([startIndex, 0], [batchSize, -1]);
-                this.gradientDescent(featureSlice, labelSlice);
+
+                this.weights = tf.tidy(() => {
+                    const featureSlice = this.features.slice([startIndex, 0], [batchSize, -1]);
+                    const labelSlice = this.labels.slice([startIndex, 0], [batchSize, -1]);
+                    return this.gradientDescent(featureSlice, labelSlice);
+                });
             }
 
             this.recordMeanSquaredError();
@@ -62,7 +68,7 @@ class LinearRegressionTensorFlow {
             .div(LinearRegressionTensorFlow.numberOfRows(features))
             .mul(2);
 
-        this.weights = this.weights
+        return this.weights
             .sub(slopes.mul(this.currentLearningRate));
     }
 
@@ -94,11 +100,15 @@ class LinearRegressionTensorFlow {
 
         if (!(this.mean && this.variance)) {
             const {mean, variance} = tf.moments(features, 0);
+
+            // used to overcome the problem with columns with only 0 and a variance of 0
+            const filler = variance.cast('bool').logicalNot().cast('float32');
+
             this.mean = mean;
-            this.variance = variance;
+            this.variance = variance.add(filler);
         }
 
-        features = this.standardize(features);
+        features = features.sub(this.mean).div(this.variance.pow(0.5));
 
         const ones = tf.ones([LinearRegressionTensorFlow.numberOfRows(features), 1]);       // generate a matrix with one column of ones
         features = ones.concat(features, 1);                // concat ones with features
@@ -106,17 +116,15 @@ class LinearRegressionTensorFlow {
         return features;
     }
 
-    standardize(features) {
-        return features.sub(this.mean).div(this.variance.pow(0.5));
-    }
-
     recordMeanSquaredError() {
-        const mse = this.features.matMul(this.weights)
-            .sub(this.labels)
-            .pow(2)
-            .sum()
-            .div(LinearRegressionTensorFlow.numberOfRows(this.features))
-            .get();
+        const mse = tf.tidy(() => {
+            return this.features.matMul(this.weights)
+                .sub(this.labels)
+                .pow(2)
+                .sum()
+                .div(LinearRegressionTensorFlow.numberOfRows(this.features))
+                .get();
+        });
 
         this.mseHistory.push(mse);
     }
