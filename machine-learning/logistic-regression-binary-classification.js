@@ -3,7 +3,7 @@ require('@tensorflow/tfjs-node');
 const loadCsv = require('./data/load-csv');
 const LogisticRegression = require('./logistic-regression-binary-classification/logistic-regression');
 
-let { features, labels, testFeatures, testLabels } = loadCsv('./data/cars.csv', {
+let {features, labels, testFeatures, testLabels} = loadCsv('./data/cars.csv', {
     shuffle: true,
     splitTest: 50,
     dataColumns: ['horsepower', 'weight', 'displacement'],

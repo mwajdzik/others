@@ -4,7 +4,7 @@ const loadCsv = require('./data/load-csv');
 const LinearRegressionManualCalc = require('./linear-regression/linear-regression-manual-calc');
 const LinearRegressionTensorFlow = require('./linear-regression/linear-regression-tensor-flow.js');
 
-let { features, labels, testFeatures, testLabels } = loadCsv('./data/cars.csv', {
+let {features, labels, testFeatures, testLabels} = loadCsv('./data/cars.csv', {
     shuffle: true,
     splitTest: 50,
     dataColumns: ['horsepower', 'weight', 'displacement'],
@@ -15,7 +15,7 @@ let { features, labels, testFeatures, testLabels } = loadCsv('./data/cars.csv', 
 
 console.log('--------------------------------------------------------------------------------------------------------');
 
-const lr = new LinearRegressionManualCalc(features, labels, { learningRate: 0.00001, iterations: 100 });
+const lr = new LinearRegressionManualCalc(features, labels, {learningRate: 0.00001, iterations: 100});
 lr.train();
 
 console.log('LinearRegression - manual calculations:\n');
@@ -40,7 +40,7 @@ function printResults(lrtf) {
         [130, 1.752, 307],
         [120, 2, 380],
         [135, 2.1, 420],
-    ]; 
+    ];
 
     const predictions = lrtf.predict(testData);
     console.log('prediction for', testData, 'is', predictions.toString());
@@ -48,19 +48,27 @@ function printResults(lrtf) {
 }
 
 console.time('Gradient Descent');
-const gradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 100 });
+const gradientDescent = new LinearRegressionTensorFlow(features, labels, {learningRate: 0.1, iterations: 100});
 gradientDescent.train();
 printResults(gradientDescent);
 console.timeEnd('Gradient Descent');
 
 console.time('Batch Gradient Descent');
-const batchGradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 5, batchSize: 10 });
+const batchGradientDescent = new LinearRegressionTensorFlow(features, labels, {
+    learningRate: 0.1,
+    iterations: 5,
+    batchSize: 10
+});
 batchGradientDescent.trainUsingBatches();
 printResults(batchGradientDescent);
 console.timeEnd('Batch Gradient Descent');
 
 console.time('Stochastic Gradient Descent');
-const stochasticGradientDescent = new LinearRegressionTensorFlow(features, labels, { learningRate: 0.1, iterations: 5, batchSize: 1 });
+const stochasticGradientDescent = new LinearRegressionTensorFlow(features, labels, {
+    learningRate: 0.1,
+    iterations: 5,
+    batchSize: 1
+});
 stochasticGradientDescent.trainUsingBatches();
 printResults(stochasticGradientDescent);
 console.timeEnd('Stochastic Gradient Descent');

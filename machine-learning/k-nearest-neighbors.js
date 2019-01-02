@@ -21,7 +21,7 @@ function knn(features, labels, predictionPoint, k) {
         .reduce((acc, a) => acc + a.get(1), 0) / k;
 }
 
-let { features, labels, testFeatures, testLabels } = loadCsv('./data/kc_house_data.csv', {
+let {features, labels, testFeatures, testLabels} = loadCsv('./data/kc_house_data.csv', {
     shuffle: true,
     splitTest: 10,
     dataColumns: ['lat', 'long', 'sqft_lot', 'sqft_living'],
@@ -30,15 +30,15 @@ let { features, labels, testFeatures, testLabels } = loadCsv('./data/kc_house_da
 
 testFeatures.forEach((testPoint, i) => {
     const result = knn(
-        tf.tensor(features), 
-        tf.tensor(labels), 
-        tf.tensor(testPoint), 
+        tf.tensor(features),
+        tf.tensor(labels),
+        tf.tensor(testPoint),
         10
     );
-    
+
     const currentLabel = testLabels[i][0];
     const err = 100 * (currentLabel - result) / currentLabel;
-    
+
     console.log('Guess', result, currentLabel);
-    console.log('Error', err);    
+    console.log('Error', err);
 });

@@ -1,13 +1,17 @@
 const tf = require('@tensorflow/tfjs');
-const _ = require('lodash');
 
 class LinearRegressionTensorFlow {
 
     constructor(features, labels, options) {
+        this.mseHistory = [];
         this.features = this.processFeatures(features);
         this.labels = tf.tensor(labels);
-        this.weights = tf.zeros([this.features.shape[1], 1]);    // create a tensor (matrix) for weights (m, b)
-        this.mseHistory = [];
+
+        // create a tensor (matrix) for weights (m, b)
+        this.weights = tf.zeros([
+            LinearRegressionTensorFlow.numberOfCols(this.features),
+            LinearRegressionTensorFlow.numberOfCols(this.labels)
+        ]);
 
         this.options = Object.assign({
             learningRate: 0.1,
@@ -27,13 +31,13 @@ class LinearRegressionTensorFlow {
     }
 
     trainUsingBatches() {
-        const { batchSize } = this.options;
-        const numberOfRows = this.numberOfRows(this.features);
+        const {batchSize} = this.options;
+        const numberOfRows = LinearRegressionTensorFlow.numberOfRows(this.features);
         const batchQuantity = Math.floor(numberOfRows / batchSize);
 
         for (let i = 0; i < this.options.iterations; i++) {
             for (let j = 0; j < batchQuantity; j++) {
-                const startIndex = j * batchSize
+                const startIndex = j * batchSize;
                 const featureSlice = this.features.slice([startIndex, 0], [batchSize, -1]);
                 const labelSlice = this.labels.slice([startIndex, 0], [batchSize, -1]);
                 this.gradientDescent(featureSlice, labelSlice);
@@ -55,7 +59,7 @@ class LinearRegressionTensorFlow {
         const slopes = features
             .transpose()
             .matMul(differences)
-            .div(this.numberOfRows(features))
+            .div(LinearRegressionTensorFlow.numberOfRows(features))
             .mul(2);
 
         this.weights = this.weights
@@ -89,14 +93,14 @@ class LinearRegressionTensorFlow {
         features = tf.tensor(features);
 
         if (!(this.mean && this.variance)) {
-            const { mean, variance } = tf.moments(features, 0);
+            const {mean, variance} = tf.moments(features, 0);
             this.mean = mean;
             this.variance = variance;
         }
 
         features = this.standardize(features);
 
-        const ones = tf.ones([this.numberOfRows(features), 1]);       // generate a matrix with one column of ones
+        const ones = tf.ones([LinearRegressionTensorFlow.numberOfRows(features), 1]);       // generate a matrix with one column of ones
         features = ones.concat(features, 1);                // concat ones with features
 
         return features;
@@ -111,7 +115,7 @@ class LinearRegressionTensorFlow {
             .sub(this.labels)
             .pow(2)
             .sum()
-            .div(this.numberOfRows(this.features))
+            .div(LinearRegressionTensorFlow.numberOfRows(this.features))
             .get();
 
         this.mseHistory.push(mse);
@@ -133,8 +137,12 @@ class LinearRegressionTensorFlow {
         }
     }
 
-    numberOfRows(tensor) {
+    static numberOfRows(tensor) {
         return tensor.shape[0];
+    }
+
+    static numberOfCols(tensor) {
+        return tensor.shape[1];
     }
 }
 
