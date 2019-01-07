@@ -12,7 +12,7 @@ import java.util.List;
 
 import static java.util.Arrays.asList;
 
-public class Learning1 {
+public class RddLearning {
 
     public static void main(String[] args) {
         Logger.getLogger("org.apache").setLevel(Level.WARN);
