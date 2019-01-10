@@ -7,8 +7,12 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.RowFactory;
 import org.apache.spark.sql.SparkSession;
-import org.apache.spark.sql.types.*;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.Metadata;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -110,6 +114,12 @@ public class SqlLearning {
                     .master("local[*]")
                     .getOrCreate()) {
 
+                SimpleDateFormat input = new SimpleDateFormat("MMMM");
+                SimpleDateFormat output = new SimpleDateFormat("M");
+
+                spark.udf().register("monthNum", (String month) ->
+                        parseInt(output.format(input.parse(month))), DataTypes.IntegerType);
+
                 Dataset<Row> dataSet = spark.read()
                         .option("header", true)
                         .csv("src/main/resources/logs/biglog.txt");
@@ -127,6 +137,17 @@ public class SqlLearning {
 
                 results = results.drop(col("monthNum"));
                 results.show(100);
+
+                Dataset<Row> resultsImproved = spark.sql("" +
+                        "SELECT " +
+                        "   level, " +
+                        "   DATE_FORMAT(datetime, 'MMMM') AS month, " +
+                        "   COUNT(*) AS total " +
+                        "FROM logging_table " +
+                        "GROUP BY month, level " +
+                        "ORDER BY monthNum(month), level, total DESC");
+
+                resultsImproved.show(100);
             }
 
         System.out.println("--------------------------------");
@@ -155,6 +176,75 @@ public class SqlLearning {
                         .drop(col("monthnum"));
 
                 result.show();
+            }
+
+        System.out.println("--------------------------------");
+
+        if (false)
+            try (SparkSession spark = SparkSession.builder()
+                    .appName("sqlSpark")
+                    .master("local[*]")
+                    .getOrCreate()) {
+
+                Dataset<Row> dataSet = spark.read()
+                        .option("header", true)
+                        .csv("src/main/resources/logs/biglog.txt");
+
+                Dataset<Row> result = dataSet.select(
+                        col("level"),
+                        date_format(col("datetime"), "MMMM")
+                                .as("month"),
+                        date_format(col("datetime"), "M")
+                                .as("monthnum")
+                                .cast(DataTypes.IntegerType))
+                        .groupBy(col("level"))
+                        .pivot("month")
+                        .count()
+                        .na().fill(0);
+
+                result.show();
+            }
+
+        System.out.println("--------------------------------");
+
+        if (false)
+            try (SparkSession spark = SparkSession.builder()
+                    .appName("sqlSpark")
+                    .master("local[*]")
+                    .getOrCreate()) {
+
+                Dataset<Row> dataSet = spark.read()
+                        .option("header", true)
+                        .csv("src/main/resources/exams/students.csv");
+
+                Dataset<Row> result = dataSet.groupBy(col("subject")).agg(
+                        max(col("score").cast(DataTypes.IntegerType)).as("max score"),
+                        min(col("score").cast(DataTypes.IntegerType)).as("min score"));
+
+                result.show();
+            }
+
+        System.out.println("--------------------------------");
+
+        // User defined functions
+        if (false)
+            try (SparkSession spark = SparkSession.builder()
+                    .appName("sqlSpark")
+                    .master("local[*]")
+                    .getOrCreate()) {
+
+                spark.udf().register("hasPassed",
+                        (String grade, String subject) -> subject.equals("Biology") ? grade.matches("[A](\\+)?") : grade.matches("[ABC](\\+)?"),
+                        DataTypes.BooleanType);
+
+                // Java API
+                Dataset<Row> dataSet = spark.read()
+                        .option("header", true)
+                        .csv("src/main/resources/exams/students.csv");
+
+                Dataset<Row> withCustomColumn = dataSet.withColumn("pass", callUDF("hasPassed", col("grade"), col("subject")));
+
+                withCustomColumn.show();
             }
     }
 }
