@@ -3,6 +3,8 @@ package org.amw061.spark.machine.learning;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.ml.evaluation.RegressionEvaluator;
+import org.apache.spark.ml.feature.OneHotEncoderEstimator;
+import org.apache.spark.ml.feature.StringIndexer;
 import org.apache.spark.ml.feature.VectorAssembler;
 import org.apache.spark.ml.param.ParamMap;
 import org.apache.spark.ml.regression.LinearRegression;
@@ -15,6 +17,8 @@ import org.apache.spark.ml.tuning.TrainValidationSplitModel;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+
+import static org.apache.spark.sql.functions.col;
 
 // https://www.kaggle.com/harlfoxem/housesalesprediction/version/1
 public class Ex02_2_HousePrices {
@@ -34,9 +38,25 @@ public class Ex02_2_HousePrices {
 
             dataSet.printSchema();
 
+            // add a new column build based on two existing ones
+            dataSet = dataSet.withColumn("sqft_above_percentage", col("sqft_above").divide(col("sqft_living")));
+            dataSet.show();
+
+            // create new columns for discrete values
+            dataSet = buildIndexer("condition").fit(dataSet).transform(dataSet);
+            dataSet = buildIndexer("grade").fit(dataSet).transform(dataSet);
+            dataSet = buildIndexer("zipcode").fit(dataSet).transform(dataSet);
+
+            OneHotEncoderEstimator conditionEncoder = new OneHotEncoderEstimator();
+            conditionEncoder.setInputCols(new String[] {"conditionIndex", "gradeIndex", "zipcodeIndex"});
+            conditionEncoder.setOutputCols(new String[] {"conditionVector", "gradeVector", "zipcodeVector"});
+            dataSet = conditionEncoder.fit(dataSet).transform(dataSet);
+            dataSet.show();
+
             VectorAssembler featuresVector = new VectorAssembler();
-            featuresVector.setInputCols(new String[]{"bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors", "grade"});
             featuresVector.setOutputCol("features");
+            featuresVector.setInputCols(new String[]{"bedrooms", "bathrooms", "sqft_living", "waterfront",
+                    "sqft_above_percentage", "floors", "conditionVector", "gradeVector", "zipcodeVector"});
 
             Dataset<Row> modelInput = featuresVector.transform(dataSet)
                     .select("price", "features")
@@ -67,6 +87,7 @@ public class Ex02_2_HousePrices {
 
             LinearRegressionModel model = (LinearRegressionModel) validationModel.bestModel();
             System.out.println("intercept: " + model.intercept() + ", coefficients: " + model.coefficients());
+            System.out.println("regParam: " + model.getRegParam() + ", elasticNetParam: " + model.getElasticNetParam());
 
             Dataset<Row> predictions = model.transform(holdOutData);
             predictions.show();
@@ -81,5 +102,12 @@ public class Ex02_2_HousePrices {
             System.out.println("The test data RMSE value is: " + testDataSummary.rootMeanSquaredError() + " (the smaller, the better)");
             System.out.println();
         }
+    }
+
+    private static StringIndexer buildIndexer(String column) {
+        StringIndexer indexer = new StringIndexer();
+        indexer.setInputCol(column);
+        indexer.setOutputCol(column + "Index");
+        return indexer;
     }
 }
