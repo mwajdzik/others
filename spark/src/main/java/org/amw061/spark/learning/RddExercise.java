@@ -65,14 +65,14 @@ public class RddExercise {
 
             // RDD containing a key of courseId and number of chapters on the course
             JavaPairRDD<Integer, Integer> chaptersInCourse = chapterData.mapToPair(row -> new Tuple2<>(row._2(), 1))
-                    .reduceByKey((a, b) -> a + b);                  // [(1,3), (2,1), (3,10)]
+                    .reduceByKey(Integer::sum);                     // [(1,3), (2,1), (3,10)]
 
             JavaPairRDD<Integer, Tuple2<Integer, Integer>> joinedRdd = viewData.distinct()
                     .mapToPair(t -> new Tuple2<>(t._2, t._1))
                     .join(chapterData);                             // [(96,(14,1)), (96,(13,1)), (97,(14,1)), (99,(14,2)), (100,(13,3))]
 
             JavaPairRDD<Tuple2<Integer, Integer>, Long> userCourseViewsCount = joinedRdd.mapToPair(t -> new Tuple2<>(t._2, 1L))
-                    .reduceByKey((a, b) -> a + b);                  // [((13,1),1), ((13,3),1), ((14,2),1), ((14,1),2)]
+                    .reduceByKey(Long::sum);                        // [((13,1),1), ((13,3),1), ((14,2),1), ((14,1),2)]
 
             JavaPairRDD<Integer, Long> courseViewCount = userCourseViewsCount
                     .mapToPair(t -> new Tuple2<>(t._1._2, t._2));   // [(1,1), (3,1), (2,1), (1,2)]
@@ -96,7 +96,7 @@ public class RddExercise {
             });
 
             JavaPairRDD<String, Long> results = courseScores
-                    .reduceByKey((a, b) -> a + b)                       // [(1,6), (2,10), (3,0)]
+                    .reduceByKey(Long::sum)                             // [(1,6), (2,10), (3,0)]
                     .join(titlesData)                                   // [(1,(6,How to find a better job)), (2,(10,Work faster harder smarter until you drop)), (3,(0,Content Creation is a Mug's Game))]
                     .mapToPair(t -> t._2)                               // [(6,How to find a better job), (10,Work faster harder smarter until you drop), (0,Content Creation is a Mug's Game)]
                     .sortByKey(false)

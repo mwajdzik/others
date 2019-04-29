@@ -15,7 +15,48 @@ import static java.util.Arrays.asList;
 public class RddLearning {
 
     public static void main(String[] args) {
-        Logger.getLogger("org.apache").setLevel(Level.WARN);
+        Logger.getLogger("org.apache").setLevel(Level.ERROR);
+
+        SparkConf conf = new SparkConf()
+                .setAppName("my spark app")
+                .setMaster("local[*]");                                     // remove for AWS EMR (contains Spark, we don't attach it)
+
+        System.out.println("\n--------------------------------\n");
+
+        // load a file (* means combine all matching files to one RDD)
+        try (JavaSparkContext sc = new JavaSparkContext(conf)) {
+            sc.textFile("src/main/resources/subtitles/input*.txt")          // for S3: s3n://amw061-spark-demos/input.txt
+                    .take(3)
+                    .forEach(System.out::println);
+        }
+
+        System.out.println("\n--------------------------------\n");
+
+        // map
+        // reduce
+        // collect
+        try (JavaSparkContext sc = new JavaSparkContext(conf)) {
+            JavaRDD<Integer> rdd = sc.parallelize(asList(36, 25, 16, 9, 4, 1));
+
+            JavaRDD<Double> sqrtRdd = rdd.map(Math::sqrt);
+            Double value1 = sqrtRdd.reduce(Double::sum);
+            Integer value2 = rdd.reduce(Integer::sum);
+            long count = sqrtRdd.count();
+
+            Long countWithMapReduce = sqrtRdd
+                    .map(a -> 1L)
+                    .reduce((a, b) -> a + 1);
+
+            rdd.map(value -> new Tuple2<>(value, Math.sqrt(value)));
+
+            System.out.println("Sum of squares: " + value1);
+            System.out.println("Sum of numbers: " + value2);
+            System.out.println("Count of numbers: " + count);
+            System.out.println("Count of numbers: " + countWithMapReduce);
+            System.out.println("All squares collected to a list: " + sqrtRdd.collect());
+        }
+
+        System.out.println("\n--------------------------------\n");
 
         List<String> logData = asList(
                 "WARN: Tuesday 4 September 0405",
@@ -26,63 +67,26 @@ public class RddLearning {
                 "WARN: Saturday 8 September 1942"
         );
 
-        SparkConf conf = new SparkConf()
-                .setAppName("startingSpark")
-                .setMaster("local[*]");       // remove for AWS EMR (contains Spark, we don't attach it)
-
-        // load a file (* means combine all matching files to one RDD)
+        // reduceByKey
+        // groupByKey
         try (JavaSparkContext sc = new JavaSparkContext(conf)) {
-            sc.textFile("src/main/resources/subtitles/input*.txt")   // s3n://amw061-spark-demos/input.txt
-                    .take(7)
-                    .forEach(System.out::println);
-        }
-
-        System.out.println("--------------------------------");
-
-        // map, reduce, collect
-        try (JavaSparkContext sc = new JavaSparkContext(conf)) {
-            List<Integer> inputData = asList(36, 25, 16, 9, 4, 1);
-            JavaRDD<Integer> rdd = sc.parallelize(inputData);
-
-            JavaRDD<Double> sqrtRdd = rdd.map(Math::sqrt);
-            Double value1 = sqrtRdd.reduce((a, b) -> a + b);
-            Integer value2 = rdd.reduce((a, b) -> a + b);
-            long count = sqrtRdd.count();
-
-            Long countWithMapReduce = sqrtRdd.map(a -> 1L)
-                    .reduce((a, b) -> a + 1);
-
-            rdd.map(value -> new Tuple2<>(value, Math.sqrt(value)));
-
-            System.out.println(value1);
-            System.out.println(value2);
-            System.out.println(count);
-            System.out.println(countWithMapReduce);
-
-            sqrtRdd.collect().forEach(System.out::println);
-        }
-
-        System.out.println("--------------------------------");
-
-        // reduceByKey, groupByKey
-        try (JavaSparkContext sc = new JavaSparkContext(conf)) {
-            // better because of performance reasons
             sc.parallelize(logData)
                     .mapToPair(value -> new Tuple2<>(value.split(":")[0], 1))
-                    .reduceByKey((a, b) -> a + b)
+                    .reduceByKey(Integer::sum)                              // better because of performance reasons
                     .collect()
                     .forEach(System.out::println);
 
             sc.parallelize(logData)
                     .mapToPair(value -> new Tuple2<>(value.split(":")[0], 1))
-                    .groupByKey()
+                    .groupByKey()                                           // enforces shuffling (wide transformation)
                     .collect()
                     .forEach(System.out::println);
         }
 
-        System.out.println("--------------------------------");
+        System.out.println("\n--------------------------------\n");
 
-        // flatMap, filter
+        // flatMap
+        // filter
         try (JavaSparkContext sc = new JavaSparkContext(conf)) {
             sc.parallelize(logData)
                     .flatMap(line -> asList(line.split("\\s+")).iterator())
@@ -91,27 +95,27 @@ public class RddLearning {
                     .forEach(System.out::println);
         }
 
-        System.out.println("--------------------------------");
+        System.out.println("\n--------------------------------\n");
 
         // use .collect() if the expected output can be handled on one machine (respects eg. sort)
         // use .coalesce(n) to enforce using n (eg. 1) partitions - should not be overused (only if we know the number of data will be reduced and there is no need to be distributed so widely)
         // be careful with .foreach()
 
         try (JavaSparkContext sc = new JavaSparkContext(conf)) {
-            sc.textFile("src/main/resources/subtitles/input.txt")
+            sc.textFile("src/main/resources/subtitles/input*.txt")
                     .flatMap(row -> asList(row.split("[^a-zA-Z]")).iterator())
                     .filter(word -> !word.isEmpty())
                     .filter(word -> word.length() > 5)
                     .map(String::toLowerCase)
                     .mapToPair(word -> new Tuple2<>(word, 1))
-                    .reduceByKey((a, b) -> a + b)
+                    .reduceByKey(Integer::sum)
                     .mapToPair(tuple -> new Tuple2<>(tuple._2, tuple._1))
                     .sortByKey(false)
                     .take(10)
                     .forEach(System.out::println);
         }
 
-        System.out.println("--------------------------------");
+        System.out.println("\n--------------------------------\n");
 
         // joins
         try (JavaSparkContext sc = new JavaSparkContext(conf)) {
