@@ -1,0 +1,43 @@
+1
+00:00:00,286 --> 00:00:01,777
+- [Instructor] Hello and welcome to this
+
+2
+00:00:01,777 --> 00:00:03,954
+virtual programmer's course,
+
+3
+00:00:03,954 --> 00:00:06,692
+where we will be exploring Docker.
+
+4
+00:00:06,692 --> 00:00:10,304
+It's going to be Docker
+with particular attention to
+
+5
+00:00:10,304 --> 00:00:13,577
+how it might affect any
+developer working on
+
+6
+00:00:13,577 --> 00:00:16,689
+or around the Java virtual machine.
+
+7
+00:00:16,689 --> 00:00:19,893
+This course is in two separate modules,
+
+8
+00:00:19,893 --> 00:00:22,051
+and the first module
+that you're watching now
+
+9
+00:00:22,051 --> 00:00:24,272
+is going to be covering the basics,
+
+10
+00:00:24,272 --> 00:00:27,050
+so if you've never worked
+with Docker before,

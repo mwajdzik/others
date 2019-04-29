@@ -6,12 +6,12 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.storage.StorageLevel;
 import scala.Tuple2;
 
 import java.util.Scanner;
 
 import static java.util.Arrays.asList;
+import static org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK;
 
 public class RddExercise {
 
@@ -61,7 +61,7 @@ public class RddExercise {
             // Question - what courses are popular?
 
             // comment out and analyze DAG
-            chapterData.persist(StorageLevel.MEMORY_AND_DISK());
+            chapterData.persist(MEMORY_AND_DISK());
 
             // RDD containing a key of courseId and number of chapters on the course
             JavaPairRDD<Integer, Integer> chaptersInCourse = chapterData.mapToPair(row -> new Tuple2<>(row._2(), 1))
