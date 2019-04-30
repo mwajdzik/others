@@ -23,7 +23,7 @@ public class SqlLearning {
     public static void main(String[] args) {
         Logger.getLogger("org.apache").setLevel(Level.WARN);
 
-        if (false)
+        if (true)
             try (SparkSession spark = SparkSession.builder()
                     .appName("sqlSpark")
                     .master("local[*]")

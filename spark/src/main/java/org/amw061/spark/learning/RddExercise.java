@@ -11,6 +11,7 @@ import scala.Tuple2;
 import java.util.Scanner;
 
 import static java.util.Arrays.asList;
+import static org.amw061.spark.learning.Utils.toCounterTuple;
 import static org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK;
 
 public class RddExercise {
@@ -60,53 +61,58 @@ public class RddExercise {
 
             // Question - what courses are popular?
 
-            // comment out and analyze DAG
+            // exercise: comment out and analyze DAG
             chapterData.persist(MEMORY_AND_DISK());
 
             // RDD containing a key of courseId and number of chapters on the course
-            JavaPairRDD<Integer, Integer> chaptersInCourse = chapterData.mapToPair(row -> new Tuple2<>(row._2(), 1))
-                    .reduceByKey(Integer::sum);                     // [(1,3), (2,1), (3,10)]
+            JavaPairRDD<Integer, Long> chaptersInCourse = chapterData.mapToPair(row -> toCounterTuple(row._2))
+                    .reduceByKey(Long::sum);                                    // [(1,3), (2,1), (3,10)]
 
             JavaPairRDD<Integer, Tuple2<Integer, Integer>> joinedRdd = viewData.distinct()
-                    .mapToPair(t -> new Tuple2<>(t._2, t._1))
-                    .join(chapterData);                             // [(96,(14,1)), (96,(13,1)), (97,(14,1)), (99,(14,2)), (100,(13,3))]
+                    .mapToPair(Utils::reverseTuple)                             // (chapterId, (userId, courseId))
+                    .join(chapterData);                                         // [(96,(14,1)), (96,(13,1)), (97,(14,1)), (99,(14,2)), (100,(13,3))]
 
-            JavaPairRDD<Tuple2<Integer, Integer>, Long> userCourseViewsCount = joinedRdd.mapToPair(t -> new Tuple2<>(t._2, 1L))
-                    .reduceByKey(Long::sum);                        // [((13,1),1), ((13,3),1), ((14,2),1), ((14,1),2)]
+            JavaPairRDD<Tuple2<Integer, Integer>, Long> userCourseViewsCount = joinedRdd
+                    .mapToPair(t -> toCounterTuple(t._2))                       // ((userId, courseId), numOfWatchedChaptersBySomeUser)
+                    .reduceByKey(Long::sum);                                    // [((13,1),1), ((13,3),1), ((14,2),1), ((14,1),2)]
 
-            JavaPairRDD<Integer, Long> courseViewCount = userCourseViewsCount
-                    .mapToPair(t -> new Tuple2<>(t._1._2, t._2));   // [(1,1), (3,1), (2,1), (1,2)]
+            JavaPairRDD<Integer, Long> courseViewCount = userCourseViewsCount   // (courseId, numOfWatchedChaptersBySomeUser)
+                    .mapToPair(t -> new Tuple2<>(t._1._2, t._2));               // [(1,1), (3,1), (2,1), (1,2)]
 
-            JavaPairRDD<Integer, Tuple2<Long, Integer>> courseViewStatistics =
-                    courseViewCount.join(chaptersInCourse);         // [(1,(1,3)), (1,(2,3)), (2,(1,1)), (3,(1,10))]
+            JavaPairRDD<Integer, Tuple2<Long, Long>> courseViewStatistics =     // (courseId, (numOfWatchedChaptersBySomeUser, numberOfChaptersInCourse))
+                    courseViewCount.join(chaptersInCourse);                     // [(1,(1,3)), (1,(2,3)), (2,(1,1)), (3,(1,10))]
 
-            JavaPairRDD<Integer, Double> courseViewPercentageStats =    // [(1,0.333), (1,0.667), (2,1.0), (3,0.1)]
-                    courseViewStatistics.mapValues(t -> 1.0 * t._1 / t._2);
+            JavaPairRDD<Integer, Double> courseViewPercentageStats =            // (courseId, numOfWatchedChaptersBySomeUser / numberOfChaptersInCourse)
+                    courseViewStatistics.mapValues(t -> 1.0 * t._1 / t._2);     // [(1,0.333), (1,0.667), (2,1.0), (3,0.1)]
 
-            JavaPairRDD<Integer, Long> courseScores = courseViewPercentageStats.mapValues(v -> {
-                if (v > 0.9) {                                          // [(1,2), (1,4), (2,10), (3,0)]
-                    return 10L;
-                } else if (v > 0.5) {
-                    return 4L;
-                } else if (v > 0.25) {
-                    return 2L;
-                } else {
-                    return 0L;
-                }
-            });
+            // > 90% of course watched - 10 points, ...
+            JavaPairRDD<Integer, Long> courseScores = courseViewPercentageStats // assign scores
+                    .mapValues(RddExercise::courseWatchedToScore);              // [(1,2), (1,4), (2,10), (3,0)]
 
             JavaPairRDD<String, Long> results = courseScores
-                    .reduceByKey(Long::sum)                             // [(1,6), (2,10), (3,0)]
-                    .join(titlesData)                                   // [(1,(6,How to find a better job)), (2,(10,Work faster harder smarter until you drop)), (3,(0,Content Creation is a Mug's Game))]
-                    .mapToPair(t -> t._2)                               // [(6,How to find a better job), (10,Work faster harder smarter until you drop), (0,Content Creation is a Mug's Game)]
+                    .reduceByKey(Long::sum)                                     // [(1,6), (2,10), (3,0)]
+                    .join(titlesData)                                           // [(1,(6,How to find a better job)), (2,(10,Work faster harder smarter until you drop)), (3,(0,Content Creation is a Mug's Game))]
+                    .mapToPair(t -> t._2)                                       // [(6,How to find a better job), (10,Work faster harder smarter until you drop), (0,Content Creation is a Mug's Game)]
                     .sortByKey(false)
-                    .mapToPair(t -> new Tuple2<>(t._2, t._1));          // [(Work faster harder smarter until you drop,10), (How to find a better job,6), (Content Creation is a Mug's Game,0)]
+                    .mapToPair(Utils::reverseTuple);                            // [(Work faster harder smarter until you drop,10), (How to find a better job,6), (Content Creation is a Mug's Game,0)]
 
             System.out.println(results.collect());
             System.out.println("Open: http://localhost:4040");
             System.out.println("Press ENTER to exit");
             Scanner scanner = new Scanner(System.in);
             scanner.nextLine();
+        }
+    }
+
+    private static Long courseWatchedToScore(Double v) {
+        if (v > 0.9) {
+            return 10L;
+        } else if (v > 0.5) {
+            return 4L;
+        } else if (v > 0.25) {
+            return 2L;
+        } else {
+            return 0L;
         }
     }
 }

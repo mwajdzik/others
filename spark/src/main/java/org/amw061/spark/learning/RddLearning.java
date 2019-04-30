@@ -11,6 +11,7 @@ import scala.Tuple2;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static org.amw061.spark.learning.Utils.toCounterTuple;
 
 public class RddLearning {
 
@@ -79,14 +80,14 @@ public class RddLearning {
         try (JavaSparkContext sc = new JavaSparkContext(conf)) {
             System.out.println("reduceByKey:");
             sc.parallelize(LOG_DATA)
-                    .mapToPair(value -> new Tuple2<>(logLevel(value), 1))
-                    .reduceByKey(Integer::sum)                              // better because of performance reasons (no shuffling)
+                    .mapToPair(value -> toCounterTuple(logLevel(value)))
+                    .reduceByKey(Long::sum)                                 // better because of performance reasons (no shuffling)
                     .collect()
                     .forEach(System.out::println);
 
             System.out.println("\ngroupByKey:");
             sc.parallelize(LOG_DATA)
-                    .mapToPair(value -> new Tuple2<>(logLevel(value), 1))
+                    .mapToPair(value -> toCounterTuple(logLevel(value)))
                     .groupByKey()                                           // enforces shuffling (wide transformation)
                     .collect()
                     .forEach(System.out::println);
@@ -119,11 +120,11 @@ public class RddLearning {
                     .flatMap(row -> asList(row.split("[^a-zA-Z]")).iterator())
                     .filter(word -> word.length() > 5)
                     .map(String::toLowerCase)
-                    .mapToPair(word -> new Tuple2<>(word, 1))
-                    .reduceByKey(Integer::sum)
-                    .mapToPair(RddLearning::reverse)
+                    .mapToPair(Utils::toCounterTuple)
+                    .reduceByKey(Long::sum)
+                    .mapToPair(Utils::reverseTuple)
                     .sortByKey(false)
-                    .mapToPair(RddLearning::reverse)
+                    .mapToPair(Utils::reverseTuple)
                     .take(10)
                     .forEach(System.out::println);
         }
@@ -162,9 +163,5 @@ public class RddLearning {
 
     private static String logLevel(String log) {
         return log.split(":")[0];
-    }
-
-    private static <A, B> Tuple2<B, A> reverse(Tuple2<A, B> t) {
-        return new Tuple2<>(t._2, t._1);
     }
 }
