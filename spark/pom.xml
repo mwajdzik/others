@@ -60,7 +60,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.amw061.spark.learning.Main</mainClass>
+                            <mainClass>org.amw061.spark.rdd.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

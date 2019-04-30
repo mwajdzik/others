@@ -1,5 +1,6 @@
-package org.amw061.spark.learning;
+package org.amw061.spark.rdd;
 
+import org.amw061.spark.Utils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
@@ -11,7 +12,7 @@ import scala.Tuple2;
 import java.util.Scanner;
 
 import static java.util.Arrays.asList;
-import static org.amw061.spark.learning.Utils.toCounterTuple;
+import static org.amw061.spark.Utils.toCounterTuple;
 import static org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK;
 
 public class RddExercise {

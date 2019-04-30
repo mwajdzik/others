@@ -1,4 +1,4 @@
-package org.amw061.spark.learning;
+package org.amw061.spark.sql;
 
 import com.google.common.collect.Lists;
 import org.apache.log4j.Level;
