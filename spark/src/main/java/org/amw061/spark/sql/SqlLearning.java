@@ -68,7 +68,9 @@ public class SqlLearning {
                 maxScore.show();
             }
 
+
         System.out.println("--------------------------------");
+
 
         if (false)
             try (SparkSession spark = SparkSession.builder()
@@ -106,7 +108,9 @@ public class SqlLearning {
                 results2.show();
             }
 
+
         System.out.println("--------------------------------");
+
 
         if (false)
             try (SparkSession spark = SparkSession.builder()
@@ -150,7 +154,9 @@ public class SqlLearning {
                 resultsImproved.show(100);
             }
 
+
         System.out.println("--------------------------------");
+
 
         if (false)
             try (SparkSession spark = SparkSession.builder()
@@ -178,7 +184,9 @@ public class SqlLearning {
                 result.show();
             }
 
+
         System.out.println("--------------------------------");
+
 
         if (false)
             try (SparkSession spark = SparkSession.builder()
@@ -205,7 +213,9 @@ public class SqlLearning {
                 result.show();
             }
 
+
         System.out.println("--------------------------------");
+
 
         if (false)
             try (SparkSession spark = SparkSession.builder()
@@ -224,7 +234,9 @@ public class SqlLearning {
                 result.show();
             }
 
+
         System.out.println("--------------------------------");
+
 
         // User defined functions
         if (false)

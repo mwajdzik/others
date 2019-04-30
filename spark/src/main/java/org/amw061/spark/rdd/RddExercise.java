@@ -9,10 +9,9 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 
-import java.util.Scanner;
-
 import static java.util.Arrays.asList;
 import static org.amw061.spark.Utils.toCounterTuple;
+import static org.amw061.spark.Utils.waitForEnter;
 import static org.apache.spark.storage.StorageLevel.MEMORY_AND_DISK;
 
 public class RddExercise {
@@ -63,6 +62,9 @@ public class RddExercise {
             // Question - what courses are popular?
 
             // exercise: comment out and analyze DAG
+            // enable caching to disk and memory, so it was not read twice in two places that use it,
+            // the difference between cache() and persist() is that using cache() the default
+            // storage level is MEMORY_ONLY while using persist() we can use various storage level
             chapterData.persist(MEMORY_AND_DISK());
 
             // RDD containing a key of courseId and number of chapters on the course
@@ -97,11 +99,12 @@ public class RddExercise {
                     .sortByKey(false)
                     .mapToPair(Utils::reverseTuple);                            // [(Work faster harder smarter until you drop,10), (How to find a better job,6), (Content Creation is a Mug's Game,0)]
 
-            System.out.println(results.collect());
-            System.out.println("Open: http://localhost:4040");
-            System.out.println("Press ENTER to exit");
-            Scanner scanner = new Scanner(System.in);
-            scanner.nextLine();
+            results = results.cache();                                          // save results to cache, so .count and .collect could use it
+
+            System.out.println("Collected:" + results.collect());
+            System.out.println("Size: " + results.count());
+
+            waitForEnter();
         }
     }
 

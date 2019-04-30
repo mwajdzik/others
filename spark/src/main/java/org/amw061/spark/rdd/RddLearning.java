@@ -32,6 +32,7 @@ public class RddLearning {
                 .setAppName("my spark app")
                 .setMaster("local[*]");                                     // remove for AWS EMR (contains Spark, we don't attach it)
 
+
         System.out.println("\n--------------------------------\n");
 
 
@@ -41,6 +42,7 @@ public class RddLearning {
                     .take(3)
                     .forEach(System.out::println);
         }
+
 
         System.out.println("\n--------------------------------\n");
 
@@ -72,6 +74,7 @@ public class RddLearning {
             System.out.println("Tuples: " + valueAndSquare.collect());
         }
 
+
         System.out.println("\n--------------------------------\n");
 
 
@@ -94,6 +97,7 @@ public class RddLearning {
                     .forEach(System.out::println);
         }
 
+
         System.out.println("\n--------------------------------\n");
 
 
@@ -107,6 +111,7 @@ public class RddLearning {
                     .collect()
                     .forEach(System.out::println);
         }
+
 
         System.out.println("\n--------------------------------\n");
 
@@ -129,6 +134,7 @@ public class RddLearning {
                     .take(10)
                     .forEach(System.out::println);
         }
+
 
         System.out.println("\n--------------------------------\n");
 
