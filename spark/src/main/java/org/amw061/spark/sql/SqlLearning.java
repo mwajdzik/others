@@ -38,18 +38,24 @@ public class SqlLearning {
                 System.out.println("Rows count: " + dataSet.count());
 
                 Row firstRow = dataSet.first();
-                System.out.println(firstRow.get(2));
-                System.out.println(firstRow.getAs("subject").toString());
+                System.out.println("First row subject: " + firstRow.get(2));
+                System.out.println("First row subject: " + firstRow.getAs("subject").toString());
 
-                Dataset<Row> filtered1 = dataSet.filter("subject = 'Modern Art' AND year >= 2007");
+                // ---
+
+                Dataset<Row> filtered1 = dataSet.filter("subject = 'Modern Art' AND year >= 2000");
                 System.out.println("Rows count: " + filtered1.count());
 
                 Dataset<Row> filtered2 = dataSet.filter(row ->
-                        row.getAs("subject").equals("Modern Art") && parseInt(row.getAs("year")) >= 2007);
+                        row.getAs("subject").equals("Modern Art") &&
+                                parseInt(row.getAs("year")) >= 2000);
 
                 System.out.println("Rows count: " + filtered2.count());
 
-                Dataset<Row> filtered3 = dataSet.filter(col("subject").equalTo("Modern Art").and(col("year").geq(2007)));
+                Dataset<Row> filtered3 = dataSet.filter(
+                        col("subject").equalTo("Modern Art")
+                                .and(col("year").geq(2000)));
+
                 System.out.println("Rows count: " + filtered3.count());
 
                 // ---
@@ -57,13 +63,13 @@ public class SqlLearning {
                 dataSet.createOrReplaceTempView("students_view");
 
                 Dataset<Row> results = spark.sql("SELECT * FROM students_view " +
-                        "WHERE subject = 'Modern Art' AND year >= 2007 " +
+                        "WHERE subject = 'Modern Art' AND year >= 2000 " +
                         "ORDER BY year DESC, score");
 
                 results.show();
 
                 Dataset<Row> maxScore = spark.sql("SELECT MAX(score) FROM students_view " +
-                        "WHERE subject = 'Modern Art' AND year >= 2007");
+                        "WHERE subject = 'Modern Art' AND year >= 2000");
 
                 maxScore.show();
             }
