@@ -62,13 +62,15 @@ public class SqlLearning {
 
                 dataSet.createOrReplaceTempView("students_view");
 
-                Dataset<Row> results = spark.sql("SELECT * FROM students_view " +
+                Dataset<Row> results = spark.sql("SELECT * " +
+                        "FROM students_view " +
                         "WHERE subject = 'Modern Art' AND year >= 2000 " +
                         "ORDER BY year DESC, score");
 
                 results.show();
 
-                Dataset<Row> maxScore = spark.sql("SELECT MAX(score) FROM students_view " +
+                Dataset<Row> maxScore = spark.sql("SELECT MAX(score), AVG(score) " +
+                        "FROM students_view " +
                         "WHERE subject = 'Modern Art' AND year >= 2000");
 
                 maxScore.show();
