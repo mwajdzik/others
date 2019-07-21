@@ -25,6 +25,8 @@ public class SqlExercise {
                     .option("header", true)
                     .csv("src/main/resources/exams/students.csv");
 
+            dataSet.show();
+
             Column avgAgr = round(avg("score"), 2).alias("avg");
             Column stdDevAgr = round(stddev("score"), 2).alias("stddev");
 
