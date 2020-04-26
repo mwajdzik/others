@@ -46,7 +46,7 @@ done
 
 # break, continue
 
-for PARAM in $@
+for PARAM in "$@"
 do
     echo "Param: ${PARAM}"
 done
