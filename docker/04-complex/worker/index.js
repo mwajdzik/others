@@ -17,10 +17,11 @@ function fib(index) {
     }
 }
 
-subscription.on('message', (channel, message) => {
-    const value = fib(parseInt(message));
-    redisClient.hset('values', message, value);
-    console.info('Calculated fib value for ' + message + ' to be ' + value);
+subscription.on('message', (channel, index) => {
+    console.info(`Got ${index} on the channel ${channel}`)
+    const value = fib(parseInt(index));
+    redisClient.hset('values', index, value);
+    console.info(`Calculated fib value for ${index} to be ${value}`);
 });
 
 subscription.subscribe('insert');

@@ -3,12 +3,16 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
+// ----------------------------------------------------------------------------------------------------
 // Express
+
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// ----------------------------------------------------------------------------------------------------
 // Postgress
+
 const { Pool } = require('pg');
 const pgClient = new Pool({
     user: keys.pgUser,
@@ -18,12 +22,15 @@ const pgClient = new Pool({
     password: keys.pgPassword
 });
 
-pgClient.on('error', () => console.log('Lost PG connection'));
+pgClient.on('error', () =>
+    console.log('Lost Postgress connection'));
 
 pgClient.query('CREATE TABLE IF NOT EXISTS values(number INT)')
     .catch(err => console.log(err));
 
+// ----------------------------------------------------------------------------------------------------
 // Redis Client
+
 const redis = require('redis');
 const redisClient = redis.createClient({
     host: keys.redisHost,
@@ -33,6 +40,7 @@ const redisClient = redis.createClient({
 
 const redisPublisher = redisClient.duplicate();
 
+// ----------------------------------------------------------------------------------------------------
 // Express route handlers
 
 app.get('/', (req, res) => {
