@@ -1,13 +1,16 @@
 const keys = require("./keys");
 const redis = require("redis");
 
+// ----------------------------------------------------------------------------------------------------
+// Redis Client
+
 const redisClient = redis.createClient({
     host: keys.redisHost,
     port: keys.redisPort,
     retry_strategy: () => 1000
 });
 
-const subscription = redisClient.duplicate();
+// ----------------------------------------------------------------------------------------------------
 
 function fib(index) {
     if (index < 2) {
@@ -16,6 +19,10 @@ function fib(index) {
         return fib(index - 1) + fib(index - 2);
     }
 }
+
+// ----------------------------------------------------------------------------------------------------
+
+const subscription = redisClient.duplicate();
 
 subscription.on('message', (channel, index) => {
     console.info(`Got ${index} on the channel ${channel}`)

@@ -13,7 +13,8 @@ app.use(bodyParser.json());
 // ----------------------------------------------------------------------------------------------------
 // Postgress
 
-const { Pool } = require('pg');
+const { Pool } = require('pg')
+
 const pgClient = new Pool({
     user: keys.pgUser,
     host: keys.pgHost,
@@ -23,10 +24,11 @@ const pgClient = new Pool({
 });
 
 pgClient.on('error', () =>
-    console.log('Lost Postgress connection'));
+        console.error('Lost Postgress connection'));
 
-pgClient.query('CREATE TABLE IF NOT EXISTS values(number INT)')
-    .catch(err => console.log(err));
+pgClient.query('CREATE TABLE IF NOT EXISTS numbers(number INT);')
+    .then(() => console.info('Table "numbers" created!'))
+    .catch(err => console.error(`Postgres error: ${err}`));
 
 // ----------------------------------------------------------------------------------------------------
 // Redis Client
@@ -48,13 +50,18 @@ app.get('/', (req, res) => {
 });
 
 app.get('/values/all', async (req, res) => {
-    const values = await pgClient.query('SELECT * FROM values');
+    console.info(`/values/all:     got request to return all seen values`)
+    const values = await pgClient.query('SELECT * FROM numbers;');
+    console.info(`/values/all:     returning ${JSON.stringify(values.rows)}`)
     res.send(values.rows);
 });
 
 app.get('/values/current', async (req, res) => {
+    console.info(`/values/current: got request to return all current values`)
+
     // no support for promises (await) in Redis
     redisClient.hgetall('values', (err, values) => {
+        console.info(`/values/current: returning ${JSON.stringify(values)}`)
         res.send(values);
     });
 });
@@ -66,10 +73,11 @@ app.post('/values', async (req, res) => {
         return res.status(422).send('Index too high');
     }
 
-    console.info('Got request to calculate fib value for ' + index);
+    console.info(`Got request to calculate fib value for ${index}`);
     redisClient.hset('values', index, 'Nothing yet!');
     redisPublisher.publish('insert', index);
-    pgClient.query('INSERT INTO values(number) VALUES($1)', [index]);
+    pgClient.query('INSERT INTO numbers(number) VALUES($1);', [index]);
+    console.info(`Done with calculations for ${index}`);
 
     res.send({working: true});
 });
