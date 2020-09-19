@@ -1,7 +1,7 @@
 resource "aws_elb" "this" {
-  name = "${var.web_app}_web"
+  name = "${var.web_app}-web"
 
-  availability_zones = var.subnets
+  subnets = var.subnets
   security_groups = var.security_groups
 
   listener {
@@ -17,7 +17,7 @@ resource "aws_elb" "this" {
 }
 
 resource "aws_launch_template" "this" {
-  name = "${var.web_app}_web"
+  name = "${var.web_app}-web"
   image_id = var.web_image_id
   instance_type = var.web_instance_type
   vpc_security_group_ids = var.security_groups
