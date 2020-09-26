@@ -1,0 +1,2 @@
+- helm ls
+- helm install wishlist-chart -f values.yaml .
