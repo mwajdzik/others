@@ -80,7 +80,7 @@ class LivenessRestController {
 class Customer {
 
     @Id
-    public Integer id;
+    private Integer id;
 
-    public String name;
+    private String name;
 }
