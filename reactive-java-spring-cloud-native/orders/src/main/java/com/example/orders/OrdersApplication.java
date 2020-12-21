@@ -35,7 +35,7 @@ class OrderRSocketController {
         for (var customerId = 1; customerId <= 8; customerId++) {
             var orders = new ArrayList<Order>();
             for (var orderId = 1; orderId <= Math.random() * 100; orderId++) {
-                orders.add(new Order(1, customerId));
+                orders.add(new Order(orderId, customerId));
             }
 
             db.put(customerId, orders);
