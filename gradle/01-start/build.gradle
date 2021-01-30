@@ -1,0 +1,65 @@
+plugins {
+    id 'org.springframework.boot' version '2.4.2'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'com.dorongold.task-tree' version '1.5'
+    id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1'
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+
+// - adhoc task
+task myAdhocTask {
+    doFirst {
+        println 'starting...'
+    }
+    doLast {
+        println "version: ${hello_version}"
+    }
+}
+
+// - typed task
+task copyFile(type: Copy) {
+    from 'src'
+    into 'build/docs'
+    include '**/*md'
+    includeEmptyDirs = false
+    mustRunAfter 'myAdhocTask'
+}
+
+task createZip(type: Zip, dependsOn: 'copyFile') {
+    from 'src'
+    archiveFileName = 'src.zip'
+    destinationDir = file('build/dist')
+    dependsOn 'copyFile'
+    dependsOn 'myAdhocTask'
+}
+
+// show DAG:
+//  gradle build taskTree
+//  gradle createZip taskTree
+
+// show all tasks:
+//  gradle tasks --all
+
+// use a script plugin:
+//  apply from: './docker.gradle'
+
+// use a binary plugin
+//  apply plugin: 'org.sonarqube'

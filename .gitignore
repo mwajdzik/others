@@ -24,3 +24,7 @@ nbdist/
 .nb-gradle/
 
 .ipynb_checkpoints
+.gradle
+build
+out
+.DS_Store
