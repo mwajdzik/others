@@ -1,2 +1,4 @@
-rootProject.name = 'basic-multi-project'
-include 'api', 'app'
+rootProject.name = 'multi-project'
+
+include 'api'
+include 'app'
