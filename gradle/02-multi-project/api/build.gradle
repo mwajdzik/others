@@ -1,19 +1,5 @@
-plugins {
-    id 'java'
-}
-
 group = 'com.example.api'
-version = '0.0.1'
-sourceCompatibility = '11'
-targetCompatibility = '11'
-
-repositories {
-    mavenCentral()
-}
 
 dependencies {
-}
-
-test {
-    useJUnitPlatform()
+    implementation 'org.apache.commons:commons-lang3:3.11'
 }
