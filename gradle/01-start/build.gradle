@@ -2,13 +2,29 @@ plugins {
     id 'org.springframework.boot' version '2.4.2'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'com.dorongold.task-tree' version '1.5'
+    // https://docs.gradle.org/current/userguide/java_plugin.html
     id 'java'
+    // https://docs.gradle.org/current/userguide/application_plugin.html
+    id 'application'
 }
 
 group = 'com.example'
 version = '0.0.1'
-sourceCompatibility = '11'
-targetCompatibility = '11'
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+compileJava {
+    options.compilerArgs << '-Werror'
+}
+
+jar {
+    archivesBaseName = 'basic'
+}
+
+application {
+    mainClassName = 'com.example.demo.DemoApplication'
+}
 
 repositories {
     mavenCentral()
@@ -52,7 +68,7 @@ task createZip(type: Zip, dependsOn: 'copyFile') {
 }
 
 // show DAG:
-//  gradle build taskTree
+//  gradle -q build taskTree
 //  gradle createZip taskTree
 
 // show all tasks:
@@ -63,3 +79,12 @@ task createZip(type: Zip, dependsOn: 'copyFile') {
 
 // use a binary plugin
 //  apply plugin: 'org.sonarqube'
+
+// Java plugin tasks:
+//  gradle installDist
+//  gradle distZip
+//  gradle javadoc
+
+// gradle -q dependencies
+
+// gradle -q dependencyInsight --dependency ch.qos.logback:logback-classic

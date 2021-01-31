@@ -1,3 +1,2 @@
 rootProject.name = 'basic-multi-project'
-include 'app1'
-include 'app2'
+include 'api', 'app'
