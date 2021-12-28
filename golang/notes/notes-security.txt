@@ -1,0 +1,35 @@
+
+OWASP Top Ten - the most critical risks to web applications
+
+
+Input
+    Injection (SQL)
+
+    Server-Side Request Forgery - a type of exploit where an attacker abuses the functionality of
+            a server causing it to access or manipulate information in the realm of that
+            server that would otherwise not be directly accessible to the attacker
+
+Output
+    Cryptographic Failures
+
+    Security Misconfiguration
+
+
+Authentication and Authorization
+    Broken Access Control
+
+    Identification and Authentication Failures
+
+    Security Misconfiguration
+
+
+Infrastructure
+    Insecure Design
+
+    Vulnerable and Outdated Components
+
+    Software and Date Integrity Failures
+
+    Security Logging and Monitoring Failures
+
+

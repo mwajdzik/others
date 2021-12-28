@@ -1,0 +1,52 @@
+main usage of Go = performant applications that are run on scaled distributed systems
+
+- requires fewer resources
+- fast build time
+- start up and run
+- statically compiled runtime is included (no JVM/JRE)
+- compiled (directly to machine's code), statically typed language
+- provides simple and readable syntax of a dynamically typed language like Python
+  and efficiency and safety of lower-level, statically typed language like C++
+- sort of object-oriented - interfaces, type implements interfaces,
+  no classes, no inheritance, no method/operator overloading
+- no structured exceptions, no try-catch (errors are returned from functions)
+- functions return errors that can be examined
+- no implicit numeric conversions
+- no Spring/Gradle/...
+- used in: Docker, Kubernetes, ...
+
+
+go run hello.go
+go build hello.go
+go test
+go test -v
+go test -run TestSimple -v
+go test -v -bench .
+
+--- benchmarking and profiling
+go test -v -bench . -run NO_SUCH_TEST -cupprofile=prof.out
+go tool pprof prof.out
+
+go get                  - install packages and dependencies
+go fmt                  - format the code
+
+go mod init cfg
+
+---
+
+module cfg
+go 1.17
+require github.com/pelletier/go-toml v1.2.0
+
+---
+
+ioutil.ReadFile(path)
+os.Remove(path)
+strings.TrimSpace(str)
+strconv.Atoi(n)
+
+file, err := os.Open("my.csv")
+"encoding/csv" rdr := csv.NewReader(file)
+
+---
+

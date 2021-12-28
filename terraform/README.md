@@ -10,6 +10,8 @@ prepare credentials config file in .aws folder
 ## Main features
 
 https://www.hashicorp.com/blog/managing-kubernetes-applications-with-hashicorp-terraform
+https://hashicorp.github.io/field-workshops-terraform/slides/gcp/terraform-oss
+https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance
 
 - dependencies definition and waiting for them 
 - outputs
@@ -17,6 +19,8 @@ https://www.hashicorp.com/blog/managing-kubernetes-applications-with-hashicorp-t
 ## Commands
 
 terraform init
+terraform plan
+
 terraform apply
 terraform destroy
 

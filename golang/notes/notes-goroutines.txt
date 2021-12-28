@@ -1,0 +1,15 @@
+
+The preferred way of communicating between go routines is by using channels.
+Channels are typed, one-directional pipes. We send values at one end, and receive the in the other end.
+
+If we try to receive and there is nothing in the channel, we'll get blocked.
+
+There are two kinds of channels:
+
+- unbuffered - when we push we will get blocked until someone receives on the other hand
+- buffered - each channel has a capacity, if the capacity is full the push operation will be blocked
+
+
+
+
+
