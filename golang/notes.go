@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"os"
 )
 
 func main() {
-	testStrings()
+	testStringsAndFormatting()
 	log.Println()
 
 	testSlices()
@@ -24,6 +25,60 @@ func main() {
 
 	testInterfaces()
 	log.Println()
+}
+
+// ---
+
+func testStringsAndFormatting() {
+	book := "The color of magic"
+
+	log.Println(book, len(book))
+	log.Println(book[4:9])
+	log.Println(book[4:])
+
+	log.Println(`
+		The 
+		multiline
+		string
+	`)
+
+	mySlice := []int{1, 2, 3}
+	myFormattedString := fmt.Sprintf("String: %+v (%T)", book, book)
+	mySliceString := fmt.Sprintf("Slice:  %+v (%T)", mySlice, mySlice)
+	fmt.Println(myFormattedString)
+	fmt.Fprint(os.Stdout, mySliceString)
+	fmt.Println("\n")
+}
+
+// ---
+
+func testSlices() {
+	loons := []string{"bugs", "daffy", "taz"}
+	log.Println(len(loons))
+	log.Println(loons[0])
+	log.Println(loons[1:])
+
+	for i := range loons {
+		log.Println(i)
+	}
+
+	for i, name := range loons {
+		log.Printf("%s at %d\n", name, i)
+	}
+
+	loons = append(loons, "elmer")
+
+	// Find max value in a slice
+
+	maxValue := math.MinInt
+	nums := []int{16, 8, 42, 4, 23, 15}
+	for _, num := range nums {
+		if num > maxValue {
+			maxValue = num
+		}
+	}
+
+	log.Printf("Maximum number of %v is %d\n", nums, maxValue)
 }
 
 // ---
@@ -109,53 +164,6 @@ func testStructs() {
 		log.Printf("%+v: %f\n", t3, Value(*t3))
 		log.Printf("%+v: %f\n", t3, t3.ValueWithPointer())
 	}
-}
-
-// ---
-
-func testStrings() {
-	book := "The color of magic"
-
-	log.Println(book, len(book))
-	log.Println(book[4:9])
-	log.Println(book[4:])
-
-	log.Println(`
-		The 
-		multiline
-		string
-	`)
-}
-
-// ---
-
-func testSlices() {
-	loons := []string{"bugs", "daffy", "taz"}
-	log.Println(len(loons))
-	log.Println(loons[0])
-	log.Println(loons[1:])
-
-	for i := range loons {
-		log.Println(i)
-	}
-
-	for i, name := range loons {
-		log.Printf("%s at %d\n", name, i)
-	}
-
-	loons = append(loons, "elmer")
-
-	// Find max value in a slice
-
-	maxValue := math.MinInt
-	nums := []int{16, 8, 42, 4, 23, 15}
-	for _, num := range nums {
-		if num > maxValue {
-			maxValue = num
-		}
-	}
-
-	log.Printf("Maximum number of %v is %d\n", nums, maxValue)
 }
 
 // ---
