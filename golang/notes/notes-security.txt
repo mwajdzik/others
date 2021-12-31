@@ -33,3 +33,6 @@ Infrastructure
     Security Logging and Monitoring Failures
 
 
+
+gosec - Golang Security Checker
+    https://github.com/securego/gosec
