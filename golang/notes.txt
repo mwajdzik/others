@@ -1,0 +1,10 @@
+Go prefers to allocate memory on the stack, so most memory allocations will end up there. This means that Go has a stack per goroutine and when possible Go will allocate variables to this stack. The Go compiler attempts to prove that a variable is not needed outside of the function by performing escape analysis to see if an object “escapes” the function. If the compiler can determine a variables lifetime, it will be allocated to a stack. However, if the variable’s lifetime is unclear it will be allocated on the heap. Generally if a Go program has a pointer to an object then that object is stored on the heap
+
+Go’s garbage collector is a non-generational concurrent, tri-color mark and sweep garbage collector.
+
+The generational hypothesis assumes that short lived objects, like temporary variables, are reclaimed most often. Thus, a generational garbage collector focuses on recently allocated objects. However, as mentioned before, compiler optimisations allow the Go compiler to allocate objects with a known lifetime to the stack. This means fewer objects will be on the heap, so fewer objects will be garbage collected. This means that a generational garbage collector is not necessary in Go. So, Go uses a non-generational garbage collector. Concurrent means that the collector runs at the same time as mutator threads. Therefore, Go uses a non-generational concurrent garbage collector. Mark and sweep is the type of garbage collector and tri-color is the algorithm used to implement this.
+
+A mark and sweep garbage collector has two phases, unsurprisingly named mark and sweep. In the mark phase the collector traverses the heap and marks objects that are no longer needed. The follow-up sweep phase removes these objects. Mark and sweep is an indirect algorithm, as it marks live objects, and removes everything else.
+
+
+
