@@ -14,6 +14,10 @@ variable "private_key_path" {
   default = "!!! define it in tfvars !!!"
 }
 
+variable "deploy_environment" {
+  default = "DEV"
+}
+
 variable "region" {
   default = "us-west-2"
 }
@@ -75,4 +79,9 @@ variable "environment_instance_settings" {
       monitoring    = true
     }
   }
+}
+
+variable "iam_accounts" {
+  type    = set(string)
+  default = ["Bob", "Mary", "Joe"]
 }

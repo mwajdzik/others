@@ -61,19 +61,21 @@ resource "aws_security_group" "sg-nodejs-instance" {
   }
 }
 
-resource "aws_instance" "nodejs1" {
+resource "aws_instance" "node_instances" {
+  count = 2
+
   key_name      = var.ssh_key_name
   subnet_id     = aws_subnet.subnet1.id
   ami           = data.aws_ami.aws-linux.id
-  instance_type = var.environment_instance_type.DEV
-  monitoring    = var.environment_instance_settings.DEV.monitoring
+  instance_type = var.environment_instance_type[var.deploy_environment]
+  monitoring    = var.environment_instance_settings[var.deploy_environment].monitoring
 
   vpc_security_group_ids = [
     aws_security_group.sg-nodejs-instance.id
   ]
 
   tags = {
-    Environment = var.environment_instance_type.DEV
+    Environment = var.environment_instance_type[var.deploy_environment]
   }
 
   connection {
@@ -82,4 +84,9 @@ resource "aws_instance" "nodejs1" {
     user        = "ec2-user"
     private_key = file(var.private_key_path)
   }
+}
+
+resource "aws_iam_user" "iam-users" {
+  for_each = var.iam_accounts
+  name     = each.key
 }
